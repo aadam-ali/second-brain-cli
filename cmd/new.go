@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
-	"os"
 
 	"github.com/aadam-ali/second-brain-cli/config"
 	"github.com/spf13/cobra"
@@ -23,7 +21,7 @@ var newCmd = &cobra.Command{
 		title := args[0]
 
 		filepath := constructNotePath(cfg.InboxDir, title)
-		content := renderNoteContent(title)
+		content := renderStdNoteContent(title)
 
 		createNote(filepath, content)
 
@@ -31,21 +29,6 @@ var newCmd = &cobra.Command{
 	},
 }
 
-func createNote(filepath string, content string) {
-	f, _ := os.Create(filepath)
-	defer f.Close()
-
-	_, err := f.Write([]byte(content))
-	if err != nil {
-		errMsg := fmt.Sprintf("Failed to create note: %s", err)
-		log.Fatal(errMsg)
-	}
-}
-
-func renderNoteContent(title string) string {
+func renderStdNoteContent(title string) string {
 	return fmt.Sprintf("# %s\n\n", title)
-}
-
-func constructNotePath(dir string, title string) string {
-	return fmt.Sprintf("%s/%s.md", dir, title)
 }
