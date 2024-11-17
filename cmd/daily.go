@@ -67,3 +67,15 @@ func renderDailyNoteContent(yesterday string, today string, tomorrow string) str
 ## Notes Created Today
 `, today, yesterday, tomorrow)
 }
+
+func appendToDailyNote(filepath string, title string) {
+	f, err := os.OpenFile(filepath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	if _, err := f.WriteString(fmt.Sprintf("\n[[%s]]", title)); err != nil {
+		log.Fatal(err)
+	}
+}
