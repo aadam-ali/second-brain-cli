@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"os"
 
 	"github.com/aadam-ali/second-brain-cli/config"
 	"github.com/spf13/cobra"
@@ -20,12 +22,31 @@ var dailyCmd = &cobra.Command{
 
 		filepath := cfg.DailyNotePath
 
-		content := renderDailyNoteContent(cfg.Yesterday, cfg.Today, cfg.Tomorrow)
+		dailyNoteExists := checkIfDailyNoteExists(filepath)
 
-		createNote(filepath, content)
+		if !dailyNoteExists {
+			content := renderDailyNoteContent(cfg.Yesterday, cfg.Today, cfg.Tomorrow)
+			createNote(filepath, content)
 
-		fmt.Println(filepath)
+			fmt.Println(filepath)
+		} else {
+			fmt.Printf("Note already exists: %s\n", filepath)
+		}
 	},
+}
+
+func checkIfDailyNoteExists(filepath string) bool {
+	_, err := os.Stat(filepath)
+
+	if err == nil {
+		return true
+	} else if os.IsNotExist(err) {
+		return false
+	}
+
+	log.Fatal(err)
+
+	return false
 }
 
 func renderDailyNoteContent(yesterday string, today string, tomorrow string) string {

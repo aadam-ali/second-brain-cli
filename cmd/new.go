@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"io/fs"
+	"log"
+	"path/filepath"
 
 	"github.com/aadam-ali/second-brain-cli/config"
 	"github.com/spf13/cobra"
@@ -20,13 +23,38 @@ var newCmd = &cobra.Command{
 
 		title := args[0]
 
-		filepath := constructNotePath(cfg.InboxDir, title)
-		content := renderStdNoteContent(title)
+		noteExists, existingNoteFilepath := checkIfNoteExists(cfg.RootDir, title)
 
-		createNote(filepath, content)
+		if !noteExists {
+			filepath := constructNotePath(cfg.InboxDir, title)
+			content := renderStdNoteContent(title)
+			createNote(filepath, content)
 
-		fmt.Println(filepath)
+			fmt.Println(filepath)
+		} else {
+			fmt.Printf("Note already exists: %s\n", existingNoteFilepath)
+		}
 	},
+}
+
+func checkIfNoteExists(rootDir string, name string) (bool, string) {
+	pathToNote := ""
+	name = name + ".md"
+
+	err := filepath.WalkDir(rootDir, func(path string, d fs.DirEntry, err error) error {
+		if !d.IsDir() && name == d.Name() {
+			pathToNote = path
+		}
+		return nil
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if pathToNote != "" {
+		return true, pathToNote
+	}
+	return false, ""
 }
 
 func renderStdNoteContent(title string) string {
