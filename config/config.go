@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+var version string = "development"
+
 type Configuration struct {
 	RootDir       string
 	InboxDir      string
@@ -14,6 +16,7 @@ type Configuration struct {
 	Yesterday     string
 	Today         string
 	Tomorrow      string
+	Version       string
 }
 
 func GetConfig() Configuration {
@@ -36,6 +39,7 @@ func GetConfig() Configuration {
 		Yesterday:     yesterday,
 		Today:         today,
 		Tomorrow:      tomorrow,
+		Version:       version,
 	}
 }
 
