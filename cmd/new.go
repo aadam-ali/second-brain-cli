@@ -9,6 +9,8 @@ import (
 
 func init() {
 	rootCmd.AddCommand(newCmd)
+
+	newCmd.Flags().BoolP("no-open", "n", false, "prevents opening of file in editor")
 }
 
 var newCmd = &cobra.Command{
@@ -18,18 +20,26 @@ var newCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg := config.GetConfig()
 
+		no_open, _ := cmd.Flags().GetBool("no-open")
+		var filepath string
+
 		title := args[0]
 
 		noteExists, existingNoteFilepath := checkIfNoteExists(cfg.RootDir, title)
 
 		if !noteExists {
-			filepath := constructNotePath(cfg.InboxDir, title)
+			filepath = constructNotePath(cfg.InboxDir, title)
 			content := renderStdNoteContent(title)
 			createNote(filepath, content)
 
 			fmt.Println(filepath)
 		} else {
-			fmt.Printf("Note already exists: %s\n", existingNoteFilepath)
+			filepath = existingNoteFilepath
+			fmt.Printf("Note already exists: %s\n", filepath)
+		}
+
+		if no_open == false {
+			openFileInVim(cfg.RootDir, filepath)
 		}
 	},
 }
