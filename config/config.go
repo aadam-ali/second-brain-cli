@@ -3,11 +3,17 @@ package config
 import (
 	"fmt"
 	"os"
+	"time"
 )
 
 type Configuration struct {
-	RootDir  string
-	InboxDir string
+	RootDir       string
+	InboxDir      string
+	JournalDir    string
+	DailyNotePath string
+	Yesterday     string
+	Today         string
+	Tomorrow      string
 }
 
 func GetConfig() Configuration {
@@ -15,10 +21,21 @@ func GetConfig() Configuration {
 
 	rootDir := getEnv("SB", fmt.Sprintf("%s/SecondBrain", userHomeDir))
 	inboxDir := getEnv("SB_INBOX", fmt.Sprintf("%s/inbox", rootDir))
+	journalDir := getEnv("SB_JOURNAL", fmt.Sprintf("%s/journal", rootDir))
+
+	yesterday := time.Now().Add(-24 * time.Hour).Format("2006-01-02")
+	today := time.Now().Format("2006-01-02")
+	tomorrow := time.Now().Add(24 * time.Hour).Format("2006-01-02")
+	dailyNotePath := fmt.Sprintf("%s/%s.md", journalDir, today)
 
 	return Configuration{
-		RootDir:  rootDir,
-		InboxDir: inboxDir,
+		RootDir:       rootDir,
+		InboxDir:      inboxDir,
+		JournalDir:    journalDir,
+		DailyNotePath: dailyNotePath,
+		Yesterday:     yesterday,
+		Today:         today,
+		Tomorrow:      tomorrow,
 	}
 }
 
