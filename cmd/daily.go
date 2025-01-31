@@ -68,8 +68,14 @@ func renderDailyNoteContent(yesterday string, today string, tomorrow string) str
 `, today, yesterday, tomorrow)
 }
 
-func appendToDailyNote(filepath string, title string) {
-	f, err := os.OpenFile(filepath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+func appendToDailyNote(cfg config.Configuration, title string) {
+	if !checkIfDailyNoteExists(cfg.DailyNotePath) {
+		content := renderDailyNoteContent(cfg.Yesterday, cfg.Today, cfg.Tomorrow)
+		createNote(cfg.DailyNotePath, content)
+		fmt.Printf("Daily note not found; creating a new one: %s\n", cfg.DailyNotePath)
+	}
+
+	f, err := os.OpenFile(cfg.DailyNotePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -34,7 +34,7 @@ var newCmd = &cobra.Command{
 			filepath = constructNotePath(cfg.InboxDir, kebabCaseTitle)
 			content := renderStdNoteContent(title)
 			createNote(filepath, content)
-			appendToDailyNote(cfg.DailyNotePath, kebabCaseTitle)
+			appendToDailyNote(cfg, kebabCaseTitle)
 
 			fmt.Println(filepath)
 		} else {
