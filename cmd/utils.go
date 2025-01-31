@@ -7,6 +7,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
+	"strings"
 )
 
 func constructNotePath(dir string, title string) string {
@@ -54,4 +56,13 @@ func openFileInVim(rootDir string, filepath string) {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+func titleToKebabCase(title string) string {
+	title = strings.ToLower(title)
+
+	title = regexp.MustCompile(`[^a-z0-9]+`).ReplaceAllString(title, "-")
+	title = regexp.MustCompile(`^-+|-+$`).ReplaceAllString(title, "")
+
+	return title
 }
