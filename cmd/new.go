@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
 
 	"github.com/aadam-ali/second-brain-cli/config"
 	"github.com/spf13/cobra"
@@ -24,14 +26,15 @@ var newCmd = &cobra.Command{
 		var filepath string
 
 		title := args[0]
+		kebabCaseTitle := titleToKebabCase(title)
 
-		noteExists, existingNoteFilepath := checkIfNoteExists(cfg.RootDir, title)
+		noteExists, existingNoteFilepath := checkIfNoteExists(cfg.RootDir, kebabCaseTitle)
 
 		if !noteExists {
-			filepath = constructNotePath(cfg.InboxDir, title)
+			filepath = constructNotePath(cfg.InboxDir, kebabCaseTitle)
 			content := renderStdNoteContent(title)
 			createNote(filepath, content)
-			appendToDailyNote(cfg.DailyNotePath, title)
+			appendToDailyNote(cfg.DailyNotePath, kebabCaseTitle)
 
 			fmt.Println(filepath)
 		} else {
@@ -43,6 +46,15 @@ var newCmd = &cobra.Command{
 			openFileInVim(cfg.RootDir, filepath)
 		}
 	},
+}
+
+func titleToKebabCase(title string) string {
+	title = strings.ToLower(title)
+
+	title = regexp.MustCompile(`[^a-z0-9]+`).ReplaceAllString(title, "-")
+	title = regexp.MustCompile(`^-+|-+$`).ReplaceAllString(title, "")
+
+	return title
 }
 
 func renderStdNoteContent(title string) string {
