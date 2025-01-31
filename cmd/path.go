@@ -19,6 +19,8 @@ var pathCmd = &cobra.Command{
 		cfg := config.GetConfig()
 		title := args[0]
 
+		title = titleToKebabCase(title)
+
 		noteExists, filepath := checkIfNoteExists(cfg.RootDir, title)
 
 		if noteExists {

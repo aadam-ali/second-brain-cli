@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"regexp"
-	"strings"
 
 	"github.com/aadam-ali/second-brain-cli/config"
 	"github.com/spf13/cobra"
@@ -46,15 +44,6 @@ var newCmd = &cobra.Command{
 			openFileInVim(cfg.RootDir, filepath)
 		}
 	},
-}
-
-func titleToKebabCase(title string) string {
-	title = strings.ToLower(title)
-
-	title = regexp.MustCompile(`[^a-z0-9]+`).ReplaceAllString(title, "-")
-	title = regexp.MustCompile(`^-+|-+$`).ReplaceAllString(title, "")
-
-	return title
 }
 
 func renderStdNoteContent(title string) string {
