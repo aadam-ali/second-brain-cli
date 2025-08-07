@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/aadam-ali/second-brain-cli/config"
+	"github.com/aadam-ali/second-brain-cli/internal"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +20,7 @@ var pathCmd = &cobra.Command{
 		cfg := config.GetConfig()
 		title := args[0]
 
-		title = titleToKebabCase(title)
+		title = internal.TitleToKebabCase(title)
 
 		noteExists, filepath := checkIfNoteExists(cfg.RootDir, title)
 
