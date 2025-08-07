@@ -8,6 +8,7 @@ import (
 
 var version string = "development"
 
+// Configuration holds the configuration settings for the CLI
 type Configuration struct {
 	RootDir       string
 	InboxDir      string
@@ -19,6 +20,8 @@ type Configuration struct {
 	Version       string
 }
 
+// GetConfig returns the Conifugration struct by reading environment
+// variables and calculating values at runtime
 func GetConfig() Configuration {
 	userHomeDir, _ := os.UserHomeDir()
 
@@ -46,7 +49,7 @@ func GetConfig() Configuration {
 func getEnv(key string, defaultValue string) string {
 	value, varExists := os.LookupEnv(key)
 
-	if varExists == true {
+	if varExists {
 		return value
 	}
 	return defaultValue
