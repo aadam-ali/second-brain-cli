@@ -1,6 +1,8 @@
 package internal
 
 import (
+	"fmt"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -12,4 +14,9 @@ func TitleToKebabCase(title string) string {
 	title = regexp.MustCompile(`^-+|-+$`).ReplaceAllString(title, "")
 
 	return title
+}
+
+func ConstructNotePath(dir string, title string) string {
+	titleWithExtension := fmt.Sprint(title, ".md")
+	return filepath.Join(dir, titleWithExtension)
 }

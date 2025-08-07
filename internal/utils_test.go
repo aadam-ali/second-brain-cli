@@ -1,6 +1,8 @@
 package internal
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestTitleToKebabCase(t *testing.T) {
 	var testCases = []struct {
@@ -22,6 +24,26 @@ func TestTitleToKebabCase(t *testing.T) {
 
 	for _, tt := range testCases {
 		got := TitleToKebabCase(tt.input)
+
+		if got != tt.want {
+			t.Errorf("got '%s', want '%s'", got, tt.want)
+		}
+
+	}
+}
+
+func TestConstructNotePath(t *testing.T) {
+	var testCases = []struct {
+		path  string
+		title string
+		want  string
+	}{
+		{"/home/test", "note", "/home/test/note.md"},
+		{"/home/test/", "note", "/home/test/note.md"},
+	}
+
+	for _, tt := range testCases {
+		got := ConstructNotePath(tt.path, tt.title)
 
 		if got != tt.want {
 			t.Errorf("got '%s', want '%s'", got, tt.want)

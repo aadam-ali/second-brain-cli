@@ -9,10 +9,6 @@ import (
 	"path/filepath"
 )
 
-func constructNotePath(dir string, title string) string {
-	return fmt.Sprintf("%s/%s.md", dir, title)
-}
-
 func createNote(filepath string, content string) {
 	f, _ := os.Create(filepath)
 	defer f.Close()
