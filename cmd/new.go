@@ -20,7 +20,7 @@ var newCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg := config.GetConfig()
 
-		no_open, _ := cmd.Flags().GetBool("no-open")
+		noOpen, _ := cmd.Flags().GetBool("no-open")
 		var filepath string
 
 		title := args[0]
@@ -40,7 +40,7 @@ var newCmd = &cobra.Command{
 			fmt.Printf("Note already exists: %s\n", filepath)
 		}
 
-		if no_open == false {
+		if !noOpen {
 			openFileInVim(cfg.RootDir, filepath)
 		}
 	},

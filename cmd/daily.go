@@ -22,7 +22,7 @@ var dailyCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg := config.GetConfig()
 
-		no_open, _ := cmd.Flags().GetBool("no-open")
+		noOpen, _ := cmd.Flags().GetBool("no-open")
 		filepath := cfg.DailyNotePath
 
 		dailyNoteExists := checkIfDailyNoteExists(filepath)
@@ -36,7 +36,7 @@ var dailyCmd = &cobra.Command{
 			fmt.Printf("Note already exists: %s\n", filepath)
 		}
 
-		if no_open == false {
+		if !noOpen {
 			openFileInVim(cfg.RootDir, cfg.DailyNotePath)
 		}
 	},
