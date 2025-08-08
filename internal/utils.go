@@ -1,4 +1,4 @@
-package cmd
+package internal
 
 import (
 	"fmt"
@@ -11,11 +11,21 @@ import (
 	"strings"
 )
 
-func constructNotePath(dir string, title string) string {
-	return fmt.Sprintf("%s/%s.md", dir, title)
+func TitleToKebabCase(title string) string {
+	title = strings.ToLower(title)
+
+	title = regexp.MustCompile(`[^a-z0-9]+`).ReplaceAllString(title, "-")
+	title = regexp.MustCompile(`^-+|-+$`).ReplaceAllString(title, "")
+
+	return title
 }
 
-func createNote(filepath string, content string) {
+func ConstructNotePath(dir string, title string) string {
+	titleWithExtension := fmt.Sprint(title, ".md")
+	return filepath.Join(dir, titleWithExtension)
+}
+
+func CreateNote(filepath string, content string) {
 	f, _ := os.Create(filepath)
 	defer f.Close()
 
@@ -26,7 +36,7 @@ func createNote(filepath string, content string) {
 	}
 }
 
-func checkIfNoteExists(rootDir string, name string) (bool, string) {
+func CheckIfNoteExists(rootDir string, name string) (bool, string) {
 	pathToNote := ""
 	name = name + ".md"
 
@@ -46,7 +56,7 @@ func checkIfNoteExists(rootDir string, name string) (bool, string) {
 	return false, ""
 }
 
-func openFileInVim(rootDir string, filepath string) {
+func OpenFileInVim(rootDir string, filepath string) {
 	cmd := exec.Command("nvim", filepath)
 	cmd.Dir = rootDir
 	cmd.Stdin = os.Stdin
@@ -56,13 +66,4 @@ func openFileInVim(rootDir string, filepath string) {
 	if err != nil {
 		fmt.Println(err)
 	}
-}
-
-func titleToKebabCase(title string) string {
-	title = strings.ToLower(title)
-
-	title = regexp.MustCompile(`[^a-z0-9]+`).ReplaceAllString(title, "-")
-	title = regexp.MustCompile(`^-+|-+$`).ReplaceAllString(title, "")
-
-	return title
 }

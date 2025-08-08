@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/aadam-ali/second-brain-cli/config"
+	"github.com/aadam-ali/second-brain-cli/internal"
 	"github.com/spf13/cobra"
 )
 
@@ -29,7 +30,7 @@ var dailyCmd = &cobra.Command{
 
 		if !dailyNoteExists {
 			content := renderDailyNoteContent(cfg.Yesterday, cfg.Today, cfg.Tomorrow)
-			createNote(filepath, content)
+			internal.CreateNote(filepath, content)
 
 			fmt.Println(filepath)
 		} else {
@@ -37,7 +38,7 @@ var dailyCmd = &cobra.Command{
 		}
 
 		if !noOpen {
-			openFileInVim(cfg.RootDir, cfg.DailyNotePath)
+			internal.OpenFileInVim(cfg.RootDir, cfg.DailyNotePath)
 		}
 	},
 }
@@ -71,7 +72,7 @@ func renderDailyNoteContent(yesterday string, today string, tomorrow string) str
 func appendToDailyNote(cfg config.Configuration, title string) {
 	if !checkIfDailyNoteExists(cfg.DailyNotePath) {
 		content := renderDailyNoteContent(cfg.Yesterday, cfg.Today, cfg.Tomorrow)
-		createNote(cfg.DailyNotePath, content)
+		internal.CreateNote(cfg.DailyNotePath, content)
 		fmt.Printf("Daily note not found; creating a new one: %s\n", cfg.DailyNotePath)
 	}
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/aadam-ali/second-brain-cli/config"
+	"github.com/aadam-ali/second-brain-cli/internal"
 	"github.com/spf13/cobra"
 )
 
@@ -24,14 +25,14 @@ var newCmd = &cobra.Command{
 		var filepath string
 
 		title := args[0]
-		kebabCaseTitle := titleToKebabCase(title)
+		kebabCaseTitle := internal.TitleToKebabCase(title)
 
-		noteExists, existingNoteFilepath := checkIfNoteExists(cfg.RootDir, kebabCaseTitle)
+		noteExists, existingNoteFilepath := internal.CheckIfNoteExists(cfg.RootDir, kebabCaseTitle)
 
 		if !noteExists {
-			filepath = constructNotePath(cfg.InboxDir, kebabCaseTitle)
+			filepath = internal.ConstructNotePath(cfg.InboxDir, kebabCaseTitle)
 			content := renderStdNoteContent(title)
-			createNote(filepath, content)
+			internal.CreateNote(filepath, content)
 			appendToDailyNote(cfg, kebabCaseTitle)
 
 			fmt.Println(filepath)
@@ -41,7 +42,7 @@ var newCmd = &cobra.Command{
 		}
 
 		if !noOpen {
-			openFileInVim(cfg.RootDir, filepath)
+			internal.OpenFileInVim(cfg.RootDir, filepath)
 		}
 	},
 }
