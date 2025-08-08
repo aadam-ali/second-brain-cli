@@ -22,7 +22,7 @@ var pathCmd = &cobra.Command{
 
 		title = internal.TitleToKebabCase(title)
 
-		noteExists, filepath := checkIfNoteExists(cfg.RootDir, title)
+		noteExists, filepath := internal.CheckIfNoteExists(cfg.RootDir, title)
 
 		if noteExists {
 			fmt.Println(filepath)

@@ -27,7 +27,7 @@ var newCmd = &cobra.Command{
 		title := args[0]
 		kebabCaseTitle := internal.TitleToKebabCase(title)
 
-		noteExists, existingNoteFilepath := checkIfNoteExists(cfg.RootDir, kebabCaseTitle)
+		noteExists, existingNoteFilepath := internal.CheckIfNoteExists(cfg.RootDir, kebabCaseTitle)
 
 		if !noteExists {
 			filepath = internal.ConstructNotePath(cfg.InboxDir, kebabCaseTitle)

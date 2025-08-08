@@ -84,3 +84,59 @@ Some content
 
 	}
 }
+
+func TestCheckIfNoteExistsReturnPathWhenExists(t *testing.T) {
+	var testCases = []bool{true, false}
+
+	for _, tt := range testCases {
+		title := "matching-title"
+
+		rootDir, _, want := createNoteInTempDir(title, tt)
+		defer os.RemoveAll(rootDir)
+
+		_, got := CheckIfNoteExists(rootDir, title)
+
+		if got != want {
+			t.Errorf("got %q, want %q", got, want)
+		}
+
+	}
+}
+
+func TestCheckIfNoteExistsReturnsEmptyStringWhenNotExists(t *testing.T) {
+	rootDir, _, _ := createNoteInTempDir("this-one-exists", false)
+	defer os.RemoveAll(rootDir)
+
+	_, got := CheckIfNoteExists(rootDir, "but-this-one-does-not")
+
+	if got != "" {
+		t.Errorf("got %q, want %q", got, "")
+	}
+}
+
+func TestCheckIfNoteExistsReturnsBool(t *testing.T) {
+
+	var testCases = []struct {
+		createTitle   string
+		expectedTitle string
+		nested        bool
+		want          bool
+	}{
+		{"this-exists", "this-exists", false, true},
+		{"this-exists", "this-exists", true, true},
+		{"this-one-exists", "but-this-one-does-not", false, false},
+		{"this-nested-one-exists", "but-this-one-does-not", true, false},
+	}
+
+	for _, tt := range testCases {
+
+		rootDir, _, _ := createNoteInTempDir(tt.createTitle, tt.nested)
+		defer os.RemoveAll(rootDir)
+
+		got, _ := CheckIfNoteExists(rootDir, tt.expectedTitle)
+
+		if got != tt.want {
+			t.Errorf("got %t, want %t", got, tt.want)
+		}
+	}
+}
