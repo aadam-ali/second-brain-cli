@@ -42,7 +42,7 @@ var newCmd = &cobra.Command{
 		}
 
 		if !noOpen {
-			openFileInVim(cfg.RootDir, filepath)
+			internal.OpenFileInVim(cfg.RootDir, filepath)
 		}
 	},
 }

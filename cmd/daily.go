@@ -38,7 +38,7 @@ var dailyCmd = &cobra.Command{
 		}
 
 		if !noOpen {
-			openFileInVim(cfg.RootDir, cfg.DailyNotePath)
+			internal.OpenFileInVim(cfg.RootDir, cfg.DailyNotePath)
 		}
 	},
 }

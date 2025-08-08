@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -53,4 +54,16 @@ func CheckIfNoteExists(rootDir string, name string) (bool, string) {
 		return true, pathToNote
 	}
 	return false, ""
+}
+
+func OpenFileInVim(rootDir string, filepath string) {
+	cmd := exec.Command("nvim", filepath)
+	cmd.Dir = rootDir
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	err := cmd.Run()
+
+	if err != nil {
+		fmt.Println(err)
+	}
 }
