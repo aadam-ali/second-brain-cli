@@ -1,6 +1,8 @@
 package internal
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -47,6 +49,37 @@ func TestConstructNotePath(t *testing.T) {
 
 		if got != tt.want {
 			t.Errorf("got '%s', want '%s'", got, tt.want)
+		}
+
+	}
+}
+
+func TestCreateNote(t *testing.T) {
+	var testCases = []struct {
+		filename string
+		content  string
+	}{
+		{"single-line.md", "note"},
+		{"newline-characters.md", "# Title\n\nThis is a title"},
+		{"single-line-raw-string-literal.md", `note`},
+		{"multiline-raw-string-literal.md", `# Another header
+
+Some content
+
+## Another header`},
+	}
+
+	for _, tt := range testCases {
+		path, _ := os.MkdirTemp("", "second-brain-cli")
+		filepath := filepath.Join(path, tt.filename)
+
+		CreateNote(filepath, tt.content)
+		got, _ := os.ReadFile(filepath)
+
+		os.RemoveAll(path)
+
+		if string(got) != tt.content {
+			t.Errorf("got '%s', want '%s'", got, tt.content)
 		}
 
 	}

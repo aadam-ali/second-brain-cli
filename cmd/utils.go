@@ -9,17 +9,6 @@ import (
 	"path/filepath"
 )
 
-func createNote(filepath string, content string) {
-	f, _ := os.Create(filepath)
-	defer f.Close()
-
-	_, err := f.Write([]byte(content))
-	if err != nil {
-		errMsg := fmt.Sprintf("Failed to create note: %s", err)
-		log.Fatal(errMsg)
-	}
-}
-
 func checkIfNoteExists(rootDir string, name string) (bool, string) {
 	pathToNote := ""
 	name = name + ".md"
