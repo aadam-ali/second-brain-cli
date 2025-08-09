@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
@@ -22,4 +23,15 @@ func captureStdout(fn func(cmd *cobra.Command, args []string) error, cmd *cobra.
 	io.Copy(&buf, r)
 
 	return buf.String(), err
+}
+
+func prepareEnvironment() string {
+	sb, _ := os.MkdirTemp("", "second-brain-cli-")
+	os.Mkdir(filepath.Join(sb, "inbox"), 0700)
+	os.Mkdir(filepath.Join(sb, "journal"), 0700)
+
+	os.Clearenv()
+	os.Setenv("SB", sb)
+
+	return sb
 }

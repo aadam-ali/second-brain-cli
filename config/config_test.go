@@ -31,7 +31,7 @@ func TestGetEnvDoesNotExist(t *testing.T) {
 }
 
 func TestGetConfigDefaultValues(t *testing.T) {
-	now = func() time.Time {
+	Now = func() time.Time {
 		return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
 	}
 
@@ -57,7 +57,7 @@ func TestGetConfigDefaultValues(t *testing.T) {
 }
 
 func TestGetConfigOverriddenValues(t *testing.T) {
-	now = func() time.Time {
+	Now = func() time.Time {
 		return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
 	}
 
