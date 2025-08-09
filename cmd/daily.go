@@ -16,31 +16,35 @@ func init() {
 	dailyCmd.Flags().BoolP("no-open", "n", false, "prevents opening of file in editor")
 }
 
+func dailyCmdFunction(cmd *cobra.Command, args []string) error {
+	cfg := config.GetConfig()
+
+	noOpen, _ := cmd.Flags().GetBool("no-open")
+	filepath := cfg.DailyNotePath
+
+	dailyNoteExists := checkIfDailyNoteExists(filepath)
+
+	if !dailyNoteExists {
+		content := renderDailyNoteContent(cfg.Yesterday, cfg.Today, cfg.Tomorrow)
+		internal.CreateNote(filepath, content)
+
+		fmt.Println(filepath)
+	} else {
+		fmt.Printf("Note already exists: %s\n", filepath)
+	}
+
+	if !noOpen {
+		internal.OpenFileInVim(cfg.RootDir, cfg.DailyNotePath)
+	}
+
+	return nil
+}
+
 var dailyCmd = &cobra.Command{
 	Use:   "daily",
 	Short: "create a daily note",
 	Args:  cobra.MatchAll(cobra.ExactArgs(0)),
-	Run: func(cmd *cobra.Command, args []string) {
-		cfg := config.GetConfig()
-
-		noOpen, _ := cmd.Flags().GetBool("no-open")
-		filepath := cfg.DailyNotePath
-
-		dailyNoteExists := checkIfDailyNoteExists(filepath)
-
-		if !dailyNoteExists {
-			content := renderDailyNoteContent(cfg.Yesterday, cfg.Today, cfg.Tomorrow)
-			internal.CreateNote(filepath, content)
-
-			fmt.Println(filepath)
-		} else {
-			fmt.Printf("Note already exists: %s\n", filepath)
-		}
-
-		if !noOpen {
-			internal.OpenFileInVim(cfg.RootDir, cfg.DailyNotePath)
-		}
-	},
+	RunE:  dailyCmdFunction,
 }
 
 func checkIfDailyNoteExists(filepath string) bool {
