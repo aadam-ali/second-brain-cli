@@ -177,3 +177,50 @@ func TestDailyCmdAlreadyExists(t *testing.T) {
 		t.Errorf("expected %q to exist", wantOutputFilepath)
 	}
 }
+
+func TestPathCmdExists(t *testing.T) {
+	sb := prepareEnvironment()
+	defer os.RemoveAll(sb)
+
+	var wantError error
+	wantOutputFilepath := filepath.Join(sb, "inbox/hello-world.md")
+	os.Create(wantOutputFilepath)
+
+	gotOutput, gotError := captureStdout(pathCmdFunction, pathCmd, []string{"hello-world"})
+
+	if gotError != wantError {
+		t.Errorf("got %q, want %q", gotError, wantError)
+	}
+
+	if !strings.Contains(gotOutput, wantOutputFilepath) {
+		t.Errorf("expected to find %q in %q", wantOutputFilepath, gotOutput)
+	}
+
+	_, statErr := os.Stat(wantOutputFilepath)
+	if statErr != nil {
+		t.Errorf("expected %q to exist", wantOutputFilepath)
+	}
+}
+
+func TestPathCmdDoesNotExist(t *testing.T) {
+	sb := prepareEnvironment()
+	defer os.RemoveAll(sb)
+
+	var wantError error
+	wantOutputFilepath := filepath.Join(sb, "somefolder/hello-world.md")
+
+	gotOutput, gotError := captureStdout(pathCmdFunction, pathCmd, []string{"hello-world"})
+
+	if gotError != wantError {
+		t.Errorf("got %q, want %q", gotError, wantError)
+	}
+
+	if strings.Contains(gotOutput, wantOutputFilepath) {
+		t.Errorf("expected to not find %q in %q", wantOutputFilepath, gotOutput)
+	}
+
+	_, statErr := os.Stat(wantOutputFilepath)
+	if statErr == nil {
+		t.Errorf("expected %q not to exist", wantOutputFilepath)
+	}
+}

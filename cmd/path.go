@@ -12,20 +12,24 @@ func init() {
 	rootCmd.AddCommand(pathCmd)
 }
 
+func pathCmdFunction(cmd *cobra.Command, args []string) error {
+	cfg := config.GetConfig()
+	title := args[0]
+
+	title = internal.TitleToKebabCase(title)
+
+	noteExists, filepath := internal.CheckIfNoteExists(cfg.RootDir, title)
+
+	if noteExists {
+		fmt.Println(filepath)
+	}
+
+	return nil
+}
+
 var pathCmd = &cobra.Command{
 	Use:   "path [title]",
 	Short: "outputs path of note if it exists",
 	Args:  cobra.MatchAll(cobra.ExactArgs(1)),
-	Run: func(cmd *cobra.Command, args []string) {
-		cfg := config.GetConfig()
-		title := args[0]
-
-		title = internal.TitleToKebabCase(title)
-
-		noteExists, filepath := internal.CheckIfNoteExists(cfg.RootDir, title)
-
-		if noteExists {
-			fmt.Println(filepath)
-		}
-	},
+	RunE:  pathCmdFunction,
 }
