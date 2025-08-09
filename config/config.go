@@ -7,7 +7,7 @@ import (
 )
 
 var version string = "development"
-var now = time.Now
+var Now = time.Now
 
 // Configuration holds the configuration settings for the CLI
 type Configuration struct {
@@ -30,9 +30,9 @@ func GetConfig() Configuration {
 	inboxDir := getEnv("SB_INBOX", fmt.Sprintf("%s/inbox", rootDir))
 	journalDir := getEnv("SB_JOURNAL", fmt.Sprintf("%s/journal", rootDir))
 
-	yesterday := now().Add(-24 * time.Hour).Format("2006-01-02")
-	today := now().Format("2006-01-02")
-	tomorrow := now().Add(24 * time.Hour).Format("2006-01-02")
+	yesterday := Now().Add(-24 * time.Hour).Format("2006-01-02")
+	today := Now().Format("2006-01-02")
+	tomorrow := Now().Add(24 * time.Hour).Format("2006-01-02")
 	dailyNotePath := fmt.Sprintf("%s/%s.md", journalDir, today)
 
 	return Configuration{
