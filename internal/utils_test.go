@@ -28,7 +28,7 @@ func TestTitleToKebabCase(t *testing.T) {
 		got := TitleToKebabCase(tt.input)
 
 		if got != tt.want {
-			t.Errorf("got '%s', want '%s'", got, tt.want)
+			t.Errorf("got %q, want %q", got, tt.want)
 		}
 
 	}
@@ -48,7 +48,7 @@ func TestConstructNotePath(t *testing.T) {
 		got := ConstructNotePath(tt.path, tt.title)
 
 		if got != tt.want {
-			t.Errorf("got '%s', want '%s'", got, tt.want)
+			t.Errorf("got %q, want %q", got, tt.want)
 		}
 
 	}
@@ -79,7 +79,7 @@ Some content
 		os.RemoveAll(path)
 
 		if string(got) != tt.content {
-			t.Errorf("got '%s', want '%s'", got, tt.content)
+			t.Errorf("got %q, want %q", got, tt.content)
 		}
 
 	}
