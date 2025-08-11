@@ -4,6 +4,8 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetEnvExists(t *testing.T) {
@@ -13,9 +15,7 @@ func TestGetEnvExists(t *testing.T) {
 
 	got := getEnv("SB_TEST_VAR", "default")
 
-	if got != want {
-		t.Errorf("got %q, want %q", got, want)
-	}
+	assert.Equal(t, want, got)
 }
 
 func TestGetEnvDoesNotExist(t *testing.T) {
@@ -25,9 +25,7 @@ func TestGetEnvDoesNotExist(t *testing.T) {
 
 	got := getEnv("SB_TEST_VAR", want)
 
-	if got != want {
-		t.Errorf("got %q, want %q", got, want)
-	}
+	assert.Equal(t, want, got)
 }
 
 func TestGetConfigDefaultValues(t *testing.T) {
@@ -51,9 +49,7 @@ func TestGetConfigDefaultValues(t *testing.T) {
 	}
 	got := GetConfig()
 
-	if got != want {
-		t.Errorf("got %+v, want %+v", got, want)
-	}
+	assert.Equal(t, want, got)
 }
 
 func TestGetConfigOverriddenValues(t *testing.T) {
@@ -84,7 +80,5 @@ func TestGetConfigOverriddenValues(t *testing.T) {
 
 	got := GetConfig()
 
-	if got != want {
-		t.Errorf("got %+v, want %+v", got, want)
-	}
+	assert.Equal(t, want, got)
 }

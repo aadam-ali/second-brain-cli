@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTitleToKebabCase(t *testing.T) {
@@ -27,10 +29,7 @@ func TestTitleToKebabCase(t *testing.T) {
 	for _, tt := range testCases {
 		got := TitleToKebabCase(tt.input)
 
-		if got != tt.want {
-			t.Errorf("got %q, want %q", got, tt.want)
-		}
-
+		assert.Equal(t, tt.want, got)
 	}
 }
 
@@ -47,10 +46,7 @@ func TestConstructNotePath(t *testing.T) {
 	for _, tt := range testCases {
 		got := ConstructNotePath(tt.path, tt.title)
 
-		if got != tt.want {
-			t.Errorf("got %q, want %q", got, tt.want)
-		}
-
+		assert.Equal(t, tt.want, got)
 	}
 }
 
@@ -78,10 +74,7 @@ Some content
 
 		os.RemoveAll(path)
 
-		if string(got) != tt.content {
-			t.Errorf("got %q, want %q", got, tt.content)
-		}
-
+		assert.Equal(t, tt.content, string(got))
 	}
 }
 
@@ -96,10 +89,7 @@ func TestCheckIfNoteExistsReturnPathWhenExists(t *testing.T) {
 
 		_, got := CheckIfNoteExists(rootDir, title)
 
-		if got != want {
-			t.Errorf("got %q, want %q", got, want)
-		}
-
+		assert.Equal(t, want, got)
 	}
 }
 
@@ -109,9 +99,7 @@ func TestCheckIfNoteExistsReturnsEmptyStringWhenNotExists(t *testing.T) {
 
 	_, got := CheckIfNoteExists(rootDir, "but-this-one-does-not")
 
-	if got != "" {
-		t.Errorf("got %q, want %q", got, "")
-	}
+	assert.Empty(t, got)
 }
 
 func TestCheckIfNoteExistsReturnsBool(t *testing.T) {
@@ -135,8 +123,6 @@ func TestCheckIfNoteExistsReturnsBool(t *testing.T) {
 
 		got, _ := CheckIfNoteExists(rootDir, tt.expectedTitle)
 
-		if got != tt.want {
-			t.Errorf("got %t, want %t", got, tt.want)
-		}
+		assert.Equal(t, tt.want, got)
 	}
 }
