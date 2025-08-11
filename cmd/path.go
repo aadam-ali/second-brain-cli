@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
-	"os"
 
 	"github.com/aadam-ali/second-brain-cli/config"
 	"github.com/aadam-ali/second-brain-cli/internal"
@@ -23,9 +21,7 @@ func pathCmdFunction(cmd *cobra.Command, args []string) error {
 	noteExists, filepath := internal.CheckIfNoteExists(cfg.RootDir, title)
 
 	if !noteExists {
-		error := fmt.Sprintf("Note with title %q (%s) does not exist", args[0], title)
-		fmt.Fprintln(os.Stderr, error)
-		return errors.New(error)
+		return internal.GetError("Note with title %q (%s) does not exist", args[0], title)
 	}
 
 	fmt.Println(filepath)

@@ -126,3 +126,17 @@ func TestCheckIfNoteExistsReturnsBool(t *testing.T) {
 		assert.Equal(t, tt.want, got)
 	}
 }
+
+func TestGetErrorNoArgs(t *testing.T) {
+	got := GetError("Hi")
+
+	assert.Error(t, got)
+	assert.ErrorContains(t, got, "Hi")
+}
+
+func TestGetErrorWithArgs(t *testing.T) {
+	got := GetError("This is a %s test", "passing")
+
+	assert.Error(t, got)
+	assert.ErrorContains(t, got, "This is a passing test")
+}

@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"log"
@@ -66,4 +67,10 @@ func OpenFileInVim(rootDir string, filepath string) {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+func GetError(template string, a ...any) error {
+	error := fmt.Sprintf(template, a...)
+	fmt.Fprintln(os.Stderr, error)
+	return errors.New(error)
 }

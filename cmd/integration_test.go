@@ -152,3 +152,58 @@ func TestPathCmdDoesNotExist(t *testing.T) {
 	assert.Error(t, statErr)
 	assert.ErrorContains(t, gotError, wantStderr)
 }
+
+func TestLinkCmd(t *testing.T) {
+	sb := prepareEnvironment()
+	defer os.RemoveAll(sb)
+
+	src := filepath.Join(sb, "journal/2025-07-13.md")
+	dest := filepath.Join(sb, "inbox", "hello-world.md")
+
+	os.Create(src)
+	os.Create(dest)
+
+	wantOutput := "[hello-world](../inbox/hello-world.md)"
+
+	gotOutput, _, gotError := captureOutput(linkCmdFunction, newCmd, []string{src, dest})
+
+	assert.NoError(t, gotError)
+	assert.Equal(t, wantOutput, gotOutput)
+}
+
+func TestLinkCmdWikiLink(t *testing.T) {
+	sb := prepareEnvironment()
+	defer os.RemoveAll(sb)
+
+	src := filepath.Join(sb, "journal/2025-07-13.md")
+	dest := filepath.Join(sb, "inbox", "hello-world.md")
+
+	os.Create(src)
+	os.Create(dest)
+
+	wantOutput := "[[hello-world]]"
+
+	linkCmd.Flags().Set("wiki", "true")
+	gotOutput, _, gotError := captureOutput(linkCmdFunction, linkCmd, []string{src, dest})
+
+	assert.NoError(t, gotError)
+	assert.Equal(t, wantOutput, gotOutput)
+}
+
+func TestLinkCmdDestNotExist(t *testing.T) {
+	sb := prepareEnvironment()
+	os.RemoveAll(sb)
+
+	src := filepath.Join(sb, "journal/2025-07-13.md")
+	dest := filepath.Join(sb, "hello-world.md")
+
+	os.Create(src)
+
+	wantError := fmt.Sprintf("stat %s: no such file or directory", dest)
+
+	_, gotStderr, gotError := captureOutput(linkCmdFunction, linkCmd, []string{src, dest})
+
+	assert.Contains(t, gotStderr, wantError)
+	assert.Error(t, gotError)
+	assert.ErrorContains(t, gotError, wantError)
+}
