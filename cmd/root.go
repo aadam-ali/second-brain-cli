@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -11,6 +10,10 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "sb",
 	Short: "sb is a note taking management tool",
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		cmd.SilenceErrors = true
+		cmd.SilenceUsage = true
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		err := cmd.Help()
 
@@ -24,7 +27,6 @@ var rootCmd = &cobra.Command{
 // this may be the root command or any of it's children
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }

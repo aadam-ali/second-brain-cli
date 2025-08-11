@@ -15,14 +15,14 @@ func TestVersionCmd(t *testing.T) {
 	var wantError error
 	wantOutput := "sb development\n"
 
-	gotOutput, gotError := captureStdout(versionCmdFunction, versionCmd, []string{})
+	gotStdout, _, gotError := captureOutput(versionCmdFunction, versionCmd, []string{})
 
 	if gotError != wantError {
 		t.Errorf("got %q, want %q", gotError, wantError)
 	}
 
-	if gotOutput != wantOutput {
-		t.Errorf("got %q, want %q", gotOutput, wantOutput)
+	if gotStdout != wantOutput {
+		t.Errorf("got %q, want %q", gotStdout, wantOutput)
 	}
 }
 
@@ -41,18 +41,18 @@ func TestNewCmd(t *testing.T) {
 	dontWantOutputDailyNote := fmt.Sprintf("Daily note not found; creating a new one: %s/journal/2025-07-13.md", sb)
 
 	newCmd.Flags().Set("no-open", "true")
-	gotOutput, gotError := captureStdout(newCmdFunction, newCmd, []string{"Hello World"})
+	gotStdout, _, gotError := captureOutput(newCmdFunction, newCmd, []string{"Hello World"})
 
 	if gotError != wantError {
 		t.Errorf("got %q, want %q", gotError, wantError)
 	}
 
-	if !strings.Contains(gotOutput, wantOutputFilepath) {
-		t.Errorf("expected to find %q in %q", wantOutputFilepath, gotOutput)
+	if !strings.Contains(gotStdout, wantOutputFilepath) {
+		t.Errorf("expected to find %q in %q", wantOutputFilepath, gotStdout)
 	}
 
-	if strings.Contains(gotOutput, dontWantOutputDailyNote) {
-		t.Errorf("expected to not find %q in %q", dontWantOutputDailyNote, gotOutput)
+	if strings.Contains(gotStdout, dontWantOutputDailyNote) {
+		t.Errorf("expected to not find %q in %q", dontWantOutputDailyNote, gotStdout)
 	}
 
 	_, newNoteErr := os.Stat(wantOutputFilepath)
@@ -65,20 +65,20 @@ func TestNewCmdExistingNote(t *testing.T) {
 	sb := prepareEnvironment()
 	defer os.RemoveAll(sb)
 
-	var wantError error
 	wantOutputFilepath := filepath.Join(sb, "inbox/hello-world.md")
+	wantOutput := fmt.Sprintf("Note with title \"hello-world\" already exists at %s", wantOutputFilepath)
+
 	os.Create(wantOutputFilepath)
-	wantOutput := fmt.Sprintf("Note already exists: %s", wantOutputFilepath)
 
 	newCmd.Flags().Set("no-open", "true")
-	gotOutput, gotError := captureStdout(newCmdFunction, newCmd, []string{"Hello World"})
+	_, gotStderr, gotError := captureOutput(newCmdFunction, newCmd, []string{"Hello World"})
 
-	if gotError != wantError {
-		t.Errorf("got %q, want %q", gotError, wantError)
+	if gotError.Error() != wantOutput {
+		t.Errorf("got %q, want %q", gotError, wantOutput)
 	}
 
-	if !strings.Contains(gotOutput, wantOutput) {
-		t.Errorf("expected to find %q in %q", wantOutput, gotOutput)
+	if !strings.Contains(gotStderr, wantOutput) {
+		t.Errorf("expected to find %q in %q", wantOutput, gotStderr)
 	}
 
 	_, newNoteErr := os.Stat(wantOutputFilepath)
@@ -100,18 +100,18 @@ func TestNewCmdCreateDailyNote(t *testing.T) {
 	wantOutputDailyNote := fmt.Sprintf("Daily note not found; creating a new one: %s/journal/2025-07-13.md", sb)
 
 	newCmd.Flags().Set("no-open", "true")
-	gotOutput, gotError := captureStdout(newCmdFunction, newCmd, []string{"Hello World"})
+	gotStdout, _, gotError := captureOutput(newCmdFunction, newCmd, []string{"Hello World"})
 
 	if gotError != wantError {
 		t.Errorf("got %q, want %q", gotError, wantError)
 	}
 
-	if !strings.Contains(gotOutput, wantOutputFilepath) {
-		t.Errorf("expected to find %q in %q", wantOutputFilepath, gotOutput)
+	if !strings.Contains(gotStdout, wantOutputFilepath) {
+		t.Errorf("expected to find %q in %q", wantOutputFilepath, gotStdout)
 	}
 
-	if !strings.Contains(gotOutput, wantOutputDailyNote) {
-		t.Errorf("expected to find %q in %q", wantOutputDailyNote, gotOutput)
+	if !strings.Contains(gotStdout, wantOutputDailyNote) {
+		t.Errorf("expected to find %q in %q", wantOutputDailyNote, gotStdout)
 	}
 
 	_, newNoteErr := os.Stat(wantOutputFilepath)
@@ -136,7 +136,7 @@ func TestDailyCmd(t *testing.T) {
 	var wantError error
 	wantOutputFilepath := filepath.Join(sb, "journal/2025-07-13.md")
 	dailyCmd.Flags().Set("no-open", "true")
-	_, gotError := captureStdout(dailyCmdFunction, dailyCmd, []string{})
+	_, _, gotError := captureOutput(dailyCmdFunction, dailyCmd, []string{})
 
 	if gotError != wantError {
 		t.Errorf("got %q, want %q", gotError, wantError)
@@ -158,18 +158,17 @@ func TestDailyCmdAlreadyExists(t *testing.T) {
 
 	var wantError error
 	wantOutputFilepath := filepath.Join(sb, "journal/2025-07-13.md")
-	wantOutput := fmt.Sprintf("Note already exists: %s", wantOutputFilepath)
 	os.Create(wantOutputFilepath)
 
 	dailyCmd.Flags().Set("no-open", "true")
-	gotOutput, gotError := captureStdout(dailyCmdFunction, dailyCmd, []string{})
+	gotStdout, _, gotError := captureOutput(dailyCmdFunction, dailyCmd, []string{})
 
 	if gotError != wantError {
 		t.Errorf("got %q, want %q", gotError, wantError)
 	}
 
-	if !strings.Contains(gotOutput, wantOutput) {
-		t.Errorf("expected to find %q in %q", wantOutputFilepath, gotOutput)
+	if !strings.Contains(gotStdout, wantOutputFilepath) {
+		t.Errorf("expected to find %q in %q", wantOutputFilepath, gotStdout)
 	}
 
 	_, dailyNoteErr := os.Stat(fmt.Sprintf("%s/journal/2025-07-13.md", sb))
@@ -186,14 +185,14 @@ func TestPathCmdExists(t *testing.T) {
 	wantOutputFilepath := filepath.Join(sb, "inbox/hello-world.md")
 	os.Create(wantOutputFilepath)
 
-	gotOutput, gotError := captureStdout(pathCmdFunction, pathCmd, []string{"hello-world"})
+	gotStdout, _, gotError := captureOutput(pathCmdFunction, pathCmd, []string{"hello-world"})
 
 	if gotError != wantError {
 		t.Errorf("got %q, want %q", gotError, wantError)
 	}
 
-	if !strings.Contains(gotOutput, wantOutputFilepath) {
-		t.Errorf("expected to find %q in %q", wantOutputFilepath, gotOutput)
+	if !strings.Contains(gotStdout, wantOutputFilepath) {
+		t.Errorf("expected to find %q in %q", wantOutputFilepath, gotStdout)
 	}
 
 	_, statErr := os.Stat(wantOutputFilepath)
@@ -206,17 +205,17 @@ func TestPathCmdDoesNotExist(t *testing.T) {
 	sb := prepareEnvironment()
 	defer os.RemoveAll(sb)
 
-	var wantError error
 	wantOutputFilepath := filepath.Join(sb, "somefolder/hello-world.md")
+	wantStderr := "Note with title \"hello-world\" (hello-world) does not exist"
 
-	gotOutput, gotError := captureStdout(pathCmdFunction, pathCmd, []string{"hello-world"})
+	_, gotStderr, gotError := captureOutput(pathCmdFunction, pathCmd, []string{"hello-world"})
 
-	if gotError != wantError {
-		t.Errorf("got %q, want %q", gotError, wantError)
+	if gotError.Error() != wantStderr {
+		t.Errorf("got %q, want %q", gotError, wantStderr)
 	}
 
-	if strings.Contains(gotOutput, wantOutputFilepath) {
-		t.Errorf("expected to not find %q in %q", wantOutputFilepath, gotOutput)
+	if !strings.Contains(gotStderr, wantStderr) {
+		t.Errorf("expected to not find %q in %q", wantStderr, gotStderr)
 	}
 
 	_, statErr := os.Stat(wantOutputFilepath)
