@@ -27,11 +27,9 @@ func dailyCmdFunction(cmd *cobra.Command, args []string) error {
 	if !dailyNoteExists {
 		content := renderDailyNoteContent(cfg.Yesterday, cfg.Today, cfg.Tomorrow)
 		internal.CreateNote(filepath, content)
-
-		fmt.Println(filepath)
-	} else {
-		fmt.Printf("Note already exists: %s\n", filepath)
 	}
+
+	fmt.Println(filepath)
 
 	if !noOpen {
 		internal.OpenFileInVim(cfg.RootDir, cfg.DailyNotePath)
