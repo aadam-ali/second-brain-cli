@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
-	"os"
 
 	"github.com/aadam-ali/second-brain-cli/config"
 	"github.com/aadam-ali/second-brain-cli/internal"
@@ -35,9 +33,7 @@ func newCmdFunction(cmd *cobra.Command, args []string) error {
 
 		fmt.Println(filepath)
 	} else {
-		error := fmt.Sprintf("Note with title %q already exists at %s", kebabCaseTitle, existingNoteFilepath)
-		fmt.Fprintln(os.Stderr, error)
-		return errors.New(error)
+		return internal.GetError("Note with title %q already exists at %s", kebabCaseTitle, existingNoteFilepath)
 	}
 
 	if !noOpen {
