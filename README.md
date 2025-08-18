@@ -1,5 +1,9 @@
 # Second Brain CLI (sb)
 
+> [!WARNING]
+> This project is under active development, assume new versions to be
+> breaking until v1.0.0
+
 ## Description
 
 Over the past few months I've been using Vim to write my notes and using Obsidian as a way to view and edit them on my other devices (phone, tablet etc.). Currently, I have been using a shell script to help me to do this but I wanted an excuse to learn and start writing some Golang hence the creation of this project.
