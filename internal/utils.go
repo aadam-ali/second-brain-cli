@@ -39,7 +39,9 @@ func CreateNote(filepath string, content string) {
 
 func CheckIfNoteExists(rootDir string, name string) (bool, string) {
 	pathToNote := ""
-	name = name + ".md"
+	// if hasExtension := strings.HasSuffix(name, ".md"); hasExtension {
+	// 	name = name + ".md"
+	// }
 
 	err := filepath.WalkDir(rootDir, func(path string, d fs.DirEntry, err error) error {
 		if !d.IsDir() && name == d.Name() {

@@ -23,7 +23,7 @@ func newCmdFunction(cmd *cobra.Command, args []string) error {
 
 	kebabCaseTitle := internal.TitleToKebabCase(title)
 
-	noteExists, existingNoteFilepath := internal.CheckIfNoteExists(cfg.RootDir, kebabCaseTitle)
+	noteExists, existingNoteFilepath := internal.CheckIfNoteExists(cfg.RootDir, kebabCaseTitle+".md")
 
 	if !noteExists {
 		filepath = internal.ConstructNotePath(cfg.InboxDir, kebabCaseTitle)

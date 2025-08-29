@@ -87,7 +87,7 @@ func TestCheckIfNoteExistsReturnPathWhenExists(t *testing.T) {
 		rootDir, _, want := createNoteInTempDir(title, tt)
 		defer os.RemoveAll(rootDir)
 
-		_, got := CheckIfNoteExists(rootDir, title)
+		_, got := CheckIfNoteExists(rootDir, title+".md")
 
 		assert.Equal(t, want, got)
 	}
@@ -97,7 +97,7 @@ func TestCheckIfNoteExistsReturnsEmptyStringWhenNotExists(t *testing.T) {
 	rootDir, _, _ := createNoteInTempDir("this-one-exists", false)
 	defer os.RemoveAll(rootDir)
 
-	_, got := CheckIfNoteExists(rootDir, "but-this-one-does-not")
+	_, got := CheckIfNoteExists(rootDir, "but-this-one-does-not"+".md")
 
 	assert.Empty(t, got)
 }
@@ -121,7 +121,7 @@ func TestCheckIfNoteExistsReturnsBool(t *testing.T) {
 		rootDir, _, _ := createNoteInTempDir(tt.createTitle, tt.nested)
 		defer os.RemoveAll(rootDir)
 
-		got, _ := CheckIfNoteExists(rootDir, tt.expectedTitle)
+		got, _ := CheckIfNoteExists(rootDir, tt.expectedTitle+".md")
 
 		assert.Equal(t, tt.want, got)
 	}
