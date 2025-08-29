@@ -8,26 +8,26 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTitleToKebabCase(t *testing.T) {
+func TestSanitiseTitle(t *testing.T) {
 	var testCases = []struct {
 		input string
 		want  string
 	}{
-		{"lower case only", "lower-case-only"},
-		{"UPPER CASE ONLY", "upper-case-only"},
-		{"Mixed Case", "mixed-case"},
+		{"lower case only", "lower case only"},
+		{"UPPER CASE ONLY", "UPPER CASE ONLY"},
+		{"Mixed Case", "Mixed Case"},
 		{"kebab-case", "kebab-case"},
-		{"squash----hyphens", "squash-hyphens"},
-		{" Leading space", "leading-space"},
-		{"-Leading hyphen", "leading-hyphen"},
-		{"Trailing hyphen-", "trailing-hyphen"},
-		{"1 c4n c0unt 123456789", "1-c4n-c0unt-123456789"},
-		{"h3llo@world!", "h3llo-world"},
-		{"Keyboard special keys `~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?", "keyboard-special-keys"},
+		{"squash----hyphens", "squash----hyphens"},
+		{" Leading space", "Leading space"},
+		{"-Leading hyphen", "Leading hyphen"},
+		{"Trailing hyphen-", "Trailing hyphen"},
+		{"1 c4n c0unt 123456789", "1 c4n c0unt 123456789"},
+		{"h3llo@world!", "h3llo world"},
+		{"Keyboard special keys `~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?", "Keyboard special keys"},
 	}
 
 	for _, tt := range testCases {
-		got := TitleToKebabCase(tt.input)
+		got := SanitiseTitle(tt.input)
 
 		assert.Equal(t, tt.want, got)
 	}

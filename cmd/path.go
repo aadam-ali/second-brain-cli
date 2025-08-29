@@ -19,13 +19,13 @@ func pathCmdFunction(cmd *cobra.Command, args []string) error {
 	cfg := config.GetConfig()
 	title := args[0]
 
-	urlEscapedTitle, _ := url.PathUnescape(title)
+	urlDecodedTitle, _ := url.PathUnescape(title)
 
 	if isWikiLink, _ := cmd.Flags().GetBool("wiki"); isWikiLink {
-		urlEscapedTitle += ".md"
+		urlDecodedTitle += ".md"
 	}
 
-	noteExists, filepath := internal.CheckIfNoteExists(cfg.RootDir, urlEscapedTitle)
+	noteExists, filepath := internal.CheckIfNoteExists(cfg.RootDir, urlDecodedTitle)
 
 	if !noteExists {
 		return internal.GetError("Note with title %q (%s) does not exist", args[0], title)

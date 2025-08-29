@@ -21,18 +21,18 @@ func newCmdFunction(cmd *cobra.Command, args []string) error {
 	var filepath string
 	title := args[0]
 
-	kebabCaseTitle := internal.TitleToKebabCase(title)
+	sanitisedTitle := internal.SanitiseTitle(title)
 
-	noteExists, existingNoteFilepath := internal.CheckIfNoteExists(cfg.RootDir, kebabCaseTitle+".md")
+	noteExists, existingNoteFilepath := internal.CheckIfNoteExists(cfg.RootDir, sanitisedTitle+".md")
 
 	if !noteExists {
-		filepath = internal.ConstructNotePath(cfg.InboxDir, kebabCaseTitle)
+		filepath = internal.ConstructNotePath(cfg.InboxDir, sanitisedTitle)
 		content := renderStdNoteContent(title)
 		internal.CreateNote(filepath, content)
 
 		fmt.Println(filepath)
 	} else {
-		return internal.GetError("Note with title %q already exists at %s", kebabCaseTitle, existingNoteFilepath)
+		return internal.GetError("Note with title %q already exists at %s", sanitisedTitle, existingNoteFilepath)
 	}
 
 	if !noOpen {

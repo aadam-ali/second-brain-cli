@@ -12,13 +12,12 @@ import (
 	"strings"
 )
 
-func TitleToKebabCase(title string) string {
-	title = strings.ToLower(title)
+func SanitiseTitle(title string) string {
+	alphanumericTitle := regexp.MustCompile(`[^A-Za-z0-9-_]+`).ReplaceAllString(title, " ")
+	squashedWhitespaceTitle := regexp.MustCompile(`\s+`).ReplaceAllString(alphanumericTitle, " ")
+	sanitisedTitle := regexp.MustCompile(`^[-_\s]+|[-_\s]+$`).ReplaceAllString(squashedWhitespaceTitle, "")
 
-	title = regexp.MustCompile(`[^a-z0-9]+`).ReplaceAllString(title, "-")
-	title = regexp.MustCompile(`^-+|-+$`).ReplaceAllString(title, "")
-
-	return title
+	return sanitisedTitle
 }
 
 func ConstructNotePath(dir string, title string) string {
@@ -41,7 +40,7 @@ func CheckIfNoteExists(rootDir string, name string) (bool, string) {
 	pathToNote := ""
 
 	err := filepath.WalkDir(rootDir, func(path string, d fs.DirEntry, err error) error {
-		if !d.IsDir() && name == d.Name() {
+		if !d.IsDir() && strings.EqualFold(name, d.Name()) {
 			pathToNote = path
 		}
 		return nil
