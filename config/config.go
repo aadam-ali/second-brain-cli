@@ -15,9 +15,8 @@ type Configuration struct {
 	InboxDir      string
 	JournalDir    string
 	DailyNotePath string
-	Yesterday     string
+	DayOfWeek     string
 	Today         string
-	Tomorrow      string
 	Version       string
 }
 
@@ -30,9 +29,8 @@ func GetConfig() Configuration {
 	inboxDir := getEnv("SB_INBOX", fmt.Sprintf("%s/inbox", rootDir))
 	journalDir := getEnv("SB_JOURNAL", fmt.Sprintf("%s/journal", rootDir))
 
-	yesterday := Now().Add(-24 * time.Hour).Format("2006-01-02")
 	today := Now().Format("2006-01-02")
-	tomorrow := Now().Add(24 * time.Hour).Format("2006-01-02")
+	dayOfWeek := Now().Weekday().String()
 	dailyNotePath := fmt.Sprintf("%s/%s.md", journalDir, today)
 
 	return Configuration{
@@ -40,9 +38,8 @@ func GetConfig() Configuration {
 		InboxDir:      inboxDir,
 		JournalDir:    journalDir,
 		DailyNotePath: dailyNotePath,
-		Yesterday:     yesterday,
+		DayOfWeek:     dayOfWeek,
 		Today:         today,
-		Tomorrow:      tomorrow,
 		Version:       version,
 	}
 }

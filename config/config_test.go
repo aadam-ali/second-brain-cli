@@ -42,9 +42,8 @@ func TestGetConfigDefaultValues(t *testing.T) {
 		InboxDir:      rootDir + "/inbox",
 		JournalDir:    rootDir + "/journal",
 		DailyNotePath: rootDir + "/journal/2025-07-13.md",
-		Yesterday:     "2025-07-12",
+		DayOfWeek:     "Sunday",
 		Today:         "2025-07-13",
-		Tomorrow:      "2025-07-14",
 		Version:       "development",
 	}
 	got := GetConfig()
@@ -72,9 +71,8 @@ func TestGetConfigOverriddenValues(t *testing.T) {
 		InboxDir:      sbInbox,
 		JournalDir:    sbJournal,
 		DailyNotePath: sbJournal + "/2025-07-13.md",
-		Yesterday:     "2025-07-12",
+		DayOfWeek:     "Sunday",
 		Today:         "2025-07-13",
-		Tomorrow:      "2025-07-14",
 		Version:       "development",
 	}
 
