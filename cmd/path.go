@@ -11,6 +11,8 @@ import (
 
 func init() {
 	rootCmd.AddCommand(pathCmd)
+
+	pathCmd.Flags().BoolP("wiki", "w", false, "assumes the filename is from a wikilink")
 }
 
 func pathCmdFunction(cmd *cobra.Command, args []string) error {
@@ -18,6 +20,10 @@ func pathCmdFunction(cmd *cobra.Command, args []string) error {
 	title := args[0]
 
 	urlEscapedTitle, _ := url.PathUnescape(title)
+
+	if isWikiLink, _ := cmd.Flags().GetBool("wiki"); isWikiLink {
+		urlEscapedTitle += ".md"
+	}
 
 	noteExists, filepath := internal.CheckIfNoteExists(cfg.RootDir, urlEscapedTitle)
 
