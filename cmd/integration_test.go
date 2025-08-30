@@ -32,7 +32,6 @@ func TestNewCmd(t *testing.T) {
 
 	var wantError error
 	wantStdoutFilepath := filepath.Join(sb, "inbox/hello-world.md")
-	dontWantOutputDailyNote := fmt.Sprintf("Daily note not found; creating a new one: %s/journal/2025-07-13.md", sb)
 
 	newCmd.Flags().Set("no-open", "true")
 	gotStdout, _, gotError := captureOutput(newCmdFunction, newCmd, []string{"Hello World"})
@@ -40,7 +39,6 @@ func TestNewCmd(t *testing.T) {
 
 	assert.Equal(t, wantError, gotError)
 	assert.Contains(t, gotStdout, wantStdoutFilepath)
-	assert.NotContains(t, gotStdout, dontWantOutputDailyNote)
 	assert.NoError(t, newNoteErr)
 }
 
@@ -62,65 +60,22 @@ func TestNewCmdExistingNote(t *testing.T) {
 	assert.ErrorContains(t, gotError, wantStderr)
 }
 
-func TestNewCmdCreateDailyNote(t *testing.T) {
-	config.Now = func() time.Time {
-		return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
-	}
-
-	sb := prepareEnvironment()
-	defer os.RemoveAll(sb)
-
-	wantStdoutFilepath := filepath.Join(sb, "inbox/hello-world.md")
-	wantStdoutDailyNote := fmt.Sprintf("Daily note not found; creating a new one: %s/journal/2025-07-13.md", sb)
-
-	newCmd.Flags().Set("no-open", "true")
-	gotStdout, _, gotError := captureOutput(newCmdFunction, newCmd, []string{"Hello World"})
-	_, newNoteErr := os.Stat(wantStdoutFilepath)
-	_, dailyNoteErr := os.Stat(fmt.Sprintf("%s/journal/2025-07-13.md", sb))
-
-	assert.Contains(t, gotStdout, wantStdoutFilepath)
-	assert.Contains(t, gotStdout, wantStdoutDailyNote)
-	assert.NoError(t, gotError)
-	assert.NoError(t, newNoteErr)
-	assert.NoError(t, dailyNoteErr)
-}
-
 func TestDailyCmd(t *testing.T) {
 	config.Now = func() time.Time {
 		return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
 	}
 
-	sb := prepareEnvironment()
-	defer os.RemoveAll(sb)
+	wantStdout := `### 2025-07-13 Sunday
+@ <location>
 
-	wantStdoutFilepath := filepath.Join(sb, "journal/2025-07-13.md")
-	dailyCmd.Flags().Set("no-open", "true")
+- todo:
+---
+`
+
 	gotStdout, _, gotError := captureOutput(dailyCmdFunction, dailyCmd, []string{})
-	_, dailyNoteErr := os.Stat(fmt.Sprintf("%s/journal/2025-07-13.md", sb))
 
-	assert.Contains(t, gotStdout, wantStdoutFilepath)
+	assert.Equal(t, wantStdout, gotStdout)
 	assert.NoError(t, gotError)
-	assert.NoError(t, dailyNoteErr)
-}
-
-func TestDailyCmdAlreadyExists(t *testing.T) {
-	config.Now = func() time.Time {
-		return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
-	}
-
-	sb := prepareEnvironment()
-	defer os.RemoveAll(sb)
-
-	wantStdoutFilepath := filepath.Join(sb, "journal/2025-07-13.md")
-	os.Create(wantStdoutFilepath)
-
-	dailyCmd.Flags().Set("no-open", "true")
-	gotStdout, _, gotError := captureOutput(dailyCmdFunction, dailyCmd, []string{})
-	_, dailyNoteErr := os.Stat(fmt.Sprintf("%s/journal/2025-07-13.md", sb))
-
-	assert.Contains(t, gotStdout, wantStdoutFilepath)
-	assert.NoError(t, gotError)
-	assert.NoError(t, dailyNoteErr)
 }
 
 func TestPathCmdExists(t *testing.T) {

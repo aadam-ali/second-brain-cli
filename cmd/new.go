@@ -29,7 +29,6 @@ func newCmdFunction(cmd *cobra.Command, args []string) error {
 		filepath = internal.ConstructNotePath(cfg.InboxDir, kebabCaseTitle)
 		content := renderStdNoteContent(title)
 		internal.CreateNote(filepath, content)
-		appendToDailyNote(cfg, kebabCaseTitle)
 
 		fmt.Println(filepath)
 	} else {

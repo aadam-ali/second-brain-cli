@@ -9,3 +9,4 @@ repos:
     rev: v0.8.3
     hooks:
       - id: go-imports
+      - id: go-test-repo-mod
