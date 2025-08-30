@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -20,7 +21,8 @@ func linkCmdFunction(cmd *cobra.Command, args []string) error {
 	src := args[0]
 	dest := args[1]
 
-	destTitle, _ := strings.CutSuffix(filepath.Base(dest), ".md")
+	destFilename := filepath.Base(dest)
+	destTitle, _ := strings.CutSuffix(destFilename, ".md")
 
 	if _, err := os.Stat(dest); err != nil {
 		return internal.GetError(err.Error())
@@ -30,24 +32,27 @@ func linkCmdFunction(cmd *cobra.Command, args []string) error {
 		return internal.GetError(err.Error())
 	}
 
+	if useWikiLink, _ := cmd.Flags().GetBool("wiki"); useWikiLink {
+		fmt.Printf("[[%s]]", destTitle)
+
+		return nil
+	}
+
 	relpath, err := filepath.Rel(filepath.Dir(src), dest)
 
 	if err != nil {
 		return internal.GetError(err.Error())
 	}
 
-	if useWikiLink, _ := cmd.Flags().GetBool("wiki"); useWikiLink {
-		fmt.Printf("[[%s]]", destTitle)
-	} else {
-		fmt.Printf("[%s](%s)", destTitle, relpath)
-	}
+	urlEncodedFilename := url.PathEscape(destFilename)
+	fmt.Printf("[%s](%s)", destTitle, filepath.Join(filepath.Dir(relpath), urlEncodedFilename))
 
 	return nil
 }
 
 var linkCmd = &cobra.Command{
 	Use:   "link [src] [dest]",
-	Short: "Display a link from src to dest",
+	Short: "Output a link to another note",
 	Args:  cobra.MatchAll(cobra.ExactArgs(2)),
 	RunE:  linkCmdFunction,
 }

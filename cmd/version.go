@@ -21,7 +21,7 @@ func versionCmdFunction(cmd *cobra.Command, args []string) error {
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "outputs version of sb",
+	Short: "Output version of sb",
 	Args:  cobra.MatchAll(cobra.ExactArgs(0)),
 	RunE:  versionCmdFunction,
 }

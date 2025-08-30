@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/aadam-ali/second-brain-cli/config"
 	"github.com/aadam-ali/second-brain-cli/internal"
@@ -10,15 +11,21 @@ import (
 
 func init() {
 	rootCmd.AddCommand(pathCmd)
+
+	pathCmd.Flags().BoolP("wiki", "w", false, "assumes the filename is from a wikilink")
 }
 
 func pathCmdFunction(cmd *cobra.Command, args []string) error {
 	cfg := config.GetConfig()
 	title := args[0]
 
-	title = internal.TitleToKebabCase(title)
+	urlEscapedTitle, _ := url.PathUnescape(title)
 
-	noteExists, filepath := internal.CheckIfNoteExists(cfg.RootDir, title)
+	if isWikiLink, _ := cmd.Flags().GetBool("wiki"); isWikiLink {
+		urlEscapedTitle += ".md"
+	}
+
+	noteExists, filepath := internal.CheckIfNoteExists(cfg.RootDir, urlEscapedTitle)
 
 	if !noteExists {
 		return internal.GetError("Note with title %q (%s) does not exist", args[0], title)
@@ -30,7 +37,7 @@ func pathCmdFunction(cmd *cobra.Command, args []string) error {
 
 var pathCmd = &cobra.Command{
 	Use:   "path [title]",
-	Short: "outputs path of note if it exists",
+	Short: "Output path of note if it exists",
 	Args:  cobra.MatchAll(cobra.ExactArgs(1)),
 	RunE:  pathCmdFunction,
 }

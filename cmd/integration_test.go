@@ -79,86 +79,151 @@ func TestDailyCmd(t *testing.T) {
 }
 
 func TestPathCmdExists(t *testing.T) {
-	sb := prepareEnvironment()
-	defer os.RemoveAll(sb)
+	var testCases = []struct {
+		filepathOutput string
+		filenameInput  string
+	}{
+		{"inbox/hello-world.md", "hello-world.md"},
+		{"inbox/hello world.md", "hello%20world.md"},
+	}
 
-	wantStdoutFilepath := filepath.Join(sb, "inbox/hello-world.md")
-	os.Create(wantStdoutFilepath)
+	for _, tt := range testCases {
+		sb := prepareEnvironment()
+		defer os.RemoveAll(sb)
 
-	gotStdout, _, gotError := captureOutput(pathCmdFunction, pathCmd, []string{"hello-world"})
-	_, statErr := os.Stat(wantStdoutFilepath)
+		wantStdoutFilepath := filepath.Join(sb, tt.filepathOutput)
+		os.Create(wantStdoutFilepath)
 
-	assert.Contains(t, gotStdout, wantStdoutFilepath)
-	assert.NoError(t, gotError)
-	assert.NoError(t, statErr)
+		gotStdout, _, gotError := captureOutput(pathCmdFunction, pathCmd, []string{tt.filenameInput})
+		_, statErr := os.Stat(wantStdoutFilepath)
+
+		assert.Contains(t, gotStdout, wantStdoutFilepath)
+		assert.NoError(t, gotError)
+		assert.NoError(t, statErr)
+
+	}
+}
+
+func TestPathCmdWikiLink(t *testing.T) {
+	var testCases = []string{
+		"hello-world",
+		"hello world",
+	}
+
+	for _, tt := range testCases {
+		sb := prepareEnvironment()
+		defer os.RemoveAll(sb)
+
+		wantStdoutFilepath := filepath.Join(sb, tt+".md")
+		os.Create(wantStdoutFilepath)
+
+		pathCmd.Flags().Set("wiki", "true")
+		gotStdout, _, gotError := captureOutput(pathCmdFunction, pathCmd, []string{tt})
+		_, statErr := os.Stat(wantStdoutFilepath)
+
+		assert.Contains(t, gotStdout, wantStdoutFilepath)
+		assert.NoError(t, gotError)
+		assert.NoError(t, statErr)
+	}
 }
 
 func TestPathCmdDoesNotExist(t *testing.T) {
-	sb := prepareEnvironment()
-	defer os.RemoveAll(sb)
+	var testCases = []struct {
+		filepathOutput string
+		filenameInput  string
+	}{
+		{"inbox/hello-world.md", "hello-world.md"},
+		{"inbox/hello world.md", "hello%20world.md"},
+	}
 
-	wantStdoutFilepath := filepath.Join(sb, "somefolder/hello-world.md")
-	wantStderr := "Note with title \"hello-world\" (hello-world) does not exist"
+	for _, tt := range testCases {
+		sb := prepareEnvironment()
+		defer os.RemoveAll(sb)
 
-	_, gotStderr, gotError := captureOutput(pathCmdFunction, pathCmd, []string{"hello-world"})
-	_, statErr := os.Stat(wantStdoutFilepath)
+		wantStdoutFilepath := filepath.Join(sb, tt.filepathOutput)
+		wantStderr := fmt.Sprintf("Note with title \"%[1]s\" (%[1]s) does not exist", tt.filenameInput)
 
-	assert.Contains(t, gotStderr, wantStderr)
-	assert.Error(t, statErr)
-	assert.ErrorContains(t, gotError, wantStderr)
+		_, gotStderr, gotError := captureOutput(pathCmdFunction, pathCmd, []string{tt.filenameInput})
+		_, statErr := os.Stat(wantStdoutFilepath)
+
+		assert.Contains(t, gotStderr, wantStderr)
+		assert.Error(t, statErr)
+		assert.ErrorContains(t, gotError, wantStderr)
+	}
+}
+
+func TestPathCmdDoesNotExistWikiLink(t *testing.T) {
+	var testCases = []string{
+		"hello-world",
+		"hello world",
+	}
+
+	for _, tt := range testCases {
+		sb := prepareEnvironment()
+		defer os.RemoveAll(sb)
+
+		wantStdoutFilepath := filepath.Join(sb, tt+".md")
+		wantStderr := fmt.Sprintf("Note with title \"%[1]s\" (%[1]s) does not exist", tt)
+
+		pathCmd.Flags().Set("wiki", "true")
+		_, gotStderr, gotError := captureOutput(pathCmdFunction, pathCmd, []string{tt})
+		_, statErr := os.Stat(wantStdoutFilepath)
+
+		assert.Contains(t, gotStderr, wantStderr)
+		assert.Error(t, statErr)
+		assert.ErrorContains(t, gotError, wantStderr)
+	}
 }
 
 func TestLinkCmd(t *testing.T) {
-	sb := prepareEnvironment()
-	defer os.RemoveAll(sb)
+	var testCases = []struct {
+		destFilenameWithoutExtension string
+		urlEncodedDestFilename       string
+	}{
+		{"bonjour-world", "bonjour-world.md"},
+		{"bonjour world", "bonjour%20world.md"},
+	}
 
-	src := filepath.Join(sb, "journal/2025-07-13.md")
-	dest := filepath.Join(sb, "inbox", "hello-world.md")
+	for _, tt := range testCases {
+		sb := prepareEnvironment()
+		defer os.RemoveAll(sb)
 
-	os.Create(src)
-	os.Create(dest)
+		src := filepath.Join(sb, "inbox", "hello-world.md")
+		dest := filepath.Join(sb, "journal", tt.destFilenameWithoutExtension+".md")
 
-	wantOutput := "[hello-world](../inbox/hello-world.md)"
+		os.Create(src)
+		os.Create(dest)
 
-	gotOutput, _, gotError := captureOutput(linkCmdFunction, newCmd, []string{src, dest})
+		wantOutput := fmt.Sprintf("[%s](../journal/%s)", tt.destFilenameWithoutExtension, tt.urlEncodedDestFilename)
+		gotOutput, _, gotError := captureOutput(linkCmdFunction, newCmd, []string{src, dest})
 
-	assert.NoError(t, gotError)
-	assert.Equal(t, wantOutput, gotOutput)
+		assert.NoError(t, gotError)
+		assert.Equal(t, wantOutput, gotOutput)
+	}
 }
 
 func TestLinkCmdWikiLink(t *testing.T) {
-	sb := prepareEnvironment()
-	defer os.RemoveAll(sb)
+	var testCases = []string{
+		"bonjour-world",
+		"bonjour world",
+	}
 
-	src := filepath.Join(sb, "journal/2025-07-13.md")
-	dest := filepath.Join(sb, "inbox", "hello-world.md")
+	for _, tt := range testCases {
+		sb := prepareEnvironment()
+		defer os.RemoveAll(sb)
 
-	os.Create(src)
-	os.Create(dest)
+		src := filepath.Join(sb, "inbox", "hello-world.md")
+		dest := filepath.Join(sb, "journal", tt+".md")
 
-	wantOutput := "[[hello-world]]"
+		os.Create(src)
+		os.Create(dest)
 
-	linkCmd.Flags().Set("wiki", "true")
-	gotOutput, _, gotError := captureOutput(linkCmdFunction, linkCmd, []string{src, dest})
+		wantOutput := fmt.Sprintf("[[%s]]", tt)
 
-	assert.NoError(t, gotError)
-	assert.Equal(t, wantOutput, gotOutput)
-}
+		linkCmd.Flags().Set("wiki", "true")
+		gotOutput, _, gotError := captureOutput(linkCmdFunction, linkCmd, []string{src, dest})
 
-func TestLinkCmdDestNotExist(t *testing.T) {
-	sb := prepareEnvironment()
-	os.RemoveAll(sb)
-
-	src := filepath.Join(sb, "journal/2025-07-13.md")
-	dest := filepath.Join(sb, "hello-world.md")
-
-	os.Create(src)
-
-	wantError := fmt.Sprintf("stat %s: no such file or directory", dest)
-
-	_, gotStderr, gotError := captureOutput(linkCmdFunction, linkCmd, []string{src, dest})
-
-	assert.Contains(t, gotStderr, wantError)
-	assert.Error(t, gotError)
-	assert.ErrorContains(t, gotError, wantError)
+		assert.NoError(t, gotError)
+		assert.Equal(t, wantOutput, gotOutput)
+	}
 }
