@@ -12,6 +12,7 @@ func init() {
 	rootCmd.AddCommand(newCmd)
 
 	newCmd.Flags().BoolP("no-open", "n", false, "prevents opening of file in editor")
+	newCmd.Flags().BoolP("date", "d", false, "prepends the date to the filename")
 }
 
 func newCmdFunction(cmd *cobra.Command, args []string) error {
@@ -22,6 +23,10 @@ func newCmdFunction(cmd *cobra.Command, args []string) error {
 	title := args[0]
 
 	sanitisedTitle := internal.SanitiseTitle(title)
+
+	if dateFlag, _ := cmd.Flags().GetBool("date"); dateFlag {
+		sanitisedTitle = config.Now().Format("20060102 ") + sanitisedTitle
+	}
 
 	noteExists, existingNoteFilepath := internal.CheckIfNoteExists(cfg.RootDir, sanitisedTitle+".md")
 

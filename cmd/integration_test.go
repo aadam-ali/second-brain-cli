@@ -87,6 +87,36 @@ func TestNewCmdExistingNote(t *testing.T) {
 	}
 }
 
+func TestNewCmdDateFlag(t *testing.T) {
+	var testCases = []struct {
+		inputTitle     string
+		sanitisedTitle string
+	}{
+		{"Hello World", "20250713 Hello World"},
+	}
+
+	for _, tt := range testCases {
+		config.Now = func() time.Time {
+			return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
+		}
+
+		sb := prepareEnvironment()
+		defer os.RemoveAll(sb)
+
+		var wantError error
+		wantStdoutFilepath := filepath.Join(sb, "inbox", tt.sanitisedTitle+".md")
+
+		newCmd.Flags().Set("no-open", "true")
+		newCmd.Flags().Set("date", "true")
+		gotStdout, _, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})
+		_, newNoteErr := os.Stat(wantStdoutFilepath)
+
+		assert.Equal(t, wantError, gotError)
+		assert.Contains(t, gotStdout, wantStdoutFilepath)
+		assert.NoError(t, newNoteErr)
+	}
+}
+
 func TestDailyCmd(t *testing.T) {
 	config.Now = func() time.Time {
 		return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
