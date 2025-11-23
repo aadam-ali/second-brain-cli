@@ -39,6 +39,35 @@ func TestNewCmd(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		config.Now = func() time.Time {
+			return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
+		}
+
+		sb := prepareEnvironment()
+		defer os.RemoveAll(sb)
+
+		var wantError error
+		wantStdoutFilepath := filepath.Join(sb, "inbox", "20250713 "+tt.sanitisedTitle+".md")
+
+		newCmd.Flags().Set("no-open", "true")
+		gotStdout, _, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})
+		_, newNoteErr := os.Stat(wantStdoutFilepath)
+
+		assert.Equal(t, wantError, gotError)
+		assert.Contains(t, gotStdout, wantStdoutFilepath)
+		assert.NoError(t, newNoteErr)
+	}
+}
+
+func TestNewCmdNoDateFlag(t *testing.T) {
+	var testCases = []struct {
+		inputTitle     string
+		sanitisedTitle string
+	}{
+		{"Hello World", "Hello World"},
+	}
+
+	for _, tt := range testCases {
 		sb := prepareEnvironment()
 		defer os.RemoveAll(sb)
 
@@ -46,6 +75,7 @@ func TestNewCmd(t *testing.T) {
 		wantStdoutFilepath := filepath.Join(sb, "inbox", tt.sanitisedTitle+".md")
 
 		newCmd.Flags().Set("no-open", "true")
+		newCmd.Flags().Set("no-date", "true")
 		gotStdout, _, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})
 		_, newNoteErr := os.Stat(wantStdoutFilepath)
 
@@ -78,6 +108,7 @@ func TestNewCmdExistingNote(t *testing.T) {
 		os.Create(wantStdoutFilepath)
 
 		newCmd.Flags().Set("no-open", "true")
+		newCmd.Flags().Set("no-date", "true")
 		_, gotStderr, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})
 		_, newNoteErr := os.Stat(wantStdoutFilepath)
 
@@ -86,37 +117,6 @@ func TestNewCmdExistingNote(t *testing.T) {
 		assert.ErrorContains(t, gotError, wantStderr)
 	}
 }
-
-func TestNewCmdDateFlag(t *testing.T) {
-	var testCases = []struct {
-		inputTitle     string
-		sanitisedTitle string
-	}{
-		{"Hello World", "20250713 Hello World"},
-	}
-
-	for _, tt := range testCases {
-		config.Now = func() time.Time {
-			return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
-		}
-
-		sb := prepareEnvironment()
-		defer os.RemoveAll(sb)
-
-		var wantError error
-		wantStdoutFilepath := filepath.Join(sb, "inbox", tt.sanitisedTitle+".md")
-
-		newCmd.Flags().Set("no-open", "true")
-		newCmd.Flags().Set("date", "true")
-		gotStdout, _, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})
-		_, newNoteErr := os.Stat(wantStdoutFilepath)
-
-		assert.Equal(t, wantError, gotError)
-		assert.Contains(t, gotStdout, wantStdoutFilepath)
-		assert.NoError(t, newNoteErr)
-	}
-}
-
 func TestDailyCmd(t *testing.T) {
 	config.Now = func() time.Time {
 		return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
