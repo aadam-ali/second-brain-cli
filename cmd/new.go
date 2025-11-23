@@ -54,5 +54,5 @@ var newCmd = &cobra.Command{
 	RunE:  newCmdFunction}
 
 func renderStdNoteContent(title string) string {
-	return fmt.Sprintf("# %s\n\n", title)
+	return fmt.Sprintf("---\ntitle: %s\n---\n", title)
 }
