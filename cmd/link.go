@@ -25,11 +25,11 @@ func linkCmdFunction(cmd *cobra.Command, args []string) error {
 	destTitle, _ := strings.CutSuffix(destFilename, ".md")
 
 	if _, err := os.Stat(dest); err != nil {
-		return internal.GetError(err.Error())
+		return internal.GetError("An error occurred: %s", err.Error())
 	}
 
 	if _, err := os.Stat(src); err != nil {
-		return internal.GetError(err.Error())
+		return internal.GetError("An error occurred: %s", err.Error())
 	}
 
 	if useWikiLink, _ := cmd.Flags().GetBool("wiki"); useWikiLink {
@@ -41,7 +41,7 @@ func linkCmdFunction(cmd *cobra.Command, args []string) error {
 	relpath, err := filepath.Rel(filepath.Dir(src), dest)
 
 	if err != nil {
-		return internal.GetError(err.Error())
+		return internal.GetError("An error occurred: %s", err.Error())
 	}
 
 	urlEncodedFilename := url.PathEscape(destFilename)

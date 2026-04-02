@@ -1,5 +1,5 @@
 [tools]
-go = "1.23.12"
+go = "1.26"
 pre-commit = "latest"
 
 [tasks.pre-commit-install]
