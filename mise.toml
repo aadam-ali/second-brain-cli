@@ -1,0 +1,26 @@
+[tools]
+go = "1.23.12"
+pre-commit = "latest"
+
+[tasks.pre-commit-install]
+description = "Install pre-commit hooks using pre-commit and mise"
+run = [
+  "mise generate git-pre-commit -w",
+  "pre-commit install"
+]
+
+[tasks.pre-commit]
+description = "Run tasks for pre-commit hook"
+depends = ["test"]
+
+[tasks.deps]
+description = "Update and Install Dependencies"
+run = ["go get -u ./...", "go mod tidy"]
+
+[tasks.test]
+description = "Run Tests"
+run = "go test -v ./..."
+
+[tasks.build]
+description = "Build"
+run = ["go build -o ./bin/sb -ldflags \"-X github.com/aadam-ali/second-brain-cli/config.version=$(git rev-parse --short HEAD)\" main.go"]
