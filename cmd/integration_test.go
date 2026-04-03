@@ -38,24 +38,28 @@ func TestNewCmd(t *testing.T) {
 		{"Keyboard special keys `~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?", "Keyboard special keys"},
 	}
 
+	createDirectoriesFlags := []bool{true, false}
+
 	for _, tt := range testCases {
-		config.Now = func() time.Time {
-			return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
+		for _, createDirectoriesFlag := range createDirectoriesFlags {
+			config.Now = func() time.Time {
+				return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
+			}
+
+			sb := prepareEnvironment(createDirectoriesFlag)
+			defer os.RemoveAll(sb)
+
+			var wantError error
+			wantStdoutFilepath := filepath.Join(sb, "inbox", "20250713 "+tt.sanitisedTitle+".md")
+
+			newCmd.Flags().Set("no-open", "true")
+			gotStdout, _, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})
+			_, newNoteErr := os.Stat(wantStdoutFilepath)
+
+			assert.Equal(t, wantError, gotError)
+			assert.Contains(t, gotStdout, wantStdoutFilepath)
+			assert.NoError(t, newNoteErr)
 		}
-
-		sb := prepareEnvironment()
-		defer os.RemoveAll(sb)
-
-		var wantError error
-		wantStdoutFilepath := filepath.Join(sb, "inbox", "20250713 "+tt.sanitisedTitle+".md")
-
-		newCmd.Flags().Set("no-open", "true")
-		gotStdout, _, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})
-		_, newNoteErr := os.Stat(wantStdoutFilepath)
-
-		assert.Equal(t, wantError, gotError)
-		assert.Contains(t, gotStdout, wantStdoutFilepath)
-		assert.NoError(t, newNoteErr)
 	}
 }
 
@@ -68,7 +72,7 @@ func TestNewCmdNoDateFlag(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment()
+		sb := prepareEnvironment(true)
 		defer os.RemoveAll(sb)
 
 		var wantError error
@@ -99,7 +103,7 @@ func TestNewCmdExistingNote(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment()
+		sb := prepareEnvironment(true)
 		defer os.RemoveAll(sb)
 
 		wantStdoutFilepath := filepath.Join(sb, "inbox", "Hello World"+".md")
@@ -145,7 +149,7 @@ func TestPathCmdExists(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment()
+		sb := prepareEnvironment(true)
 		defer os.RemoveAll(sb)
 
 		wantStdoutFilepath := filepath.Join(sb, tt.filepathOutput)
@@ -168,7 +172,7 @@ func TestPathCmdWikiLink(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment()
+		sb := prepareEnvironment(true)
 		defer os.RemoveAll(sb)
 
 		wantStdoutFilepath := filepath.Join(sb, tt+".md")
@@ -194,7 +198,7 @@ func TestPathCmdDoesNotExist(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment()
+		sb := prepareEnvironment(true)
 		defer os.RemoveAll(sb)
 
 		wantStdoutFilepath := filepath.Join(sb, tt.filepathOutput)
@@ -216,7 +220,7 @@ func TestPathCmdDoesNotExistWikiLink(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment()
+		sb := prepareEnvironment(true)
 		defer os.RemoveAll(sb)
 
 		wantStdoutFilepath := filepath.Join(sb, tt+".md")
@@ -242,7 +246,7 @@ func TestLinkCmd(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment()
+		sb := prepareEnvironment(true)
 		defer os.RemoveAll(sb)
 
 		src := filepath.Join(sb, "inbox", "hello-world.md")
@@ -266,7 +270,7 @@ func TestLinkCmdWikiLink(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment()
+		sb := prepareEnvironment(true)
 		defer os.RemoveAll(sb)
 
 		src := filepath.Join(sb, "inbox", "hello-world.md")

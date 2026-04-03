@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -34,10 +36,14 @@ func captureOutput(fn func(cmd *cobra.Command, args []string) error, cmd *cobra.
 	return bufOut.String(), bufErr.String(), err
 }
 
-func prepareEnvironment() string {
-	sb, _ := os.MkdirTemp("", "second-brain-cli-")
-	os.Mkdir(filepath.Join(sb, "inbox"), 0700)
-	os.Mkdir(filepath.Join(sb, "journal"), 0700)
+func prepareEnvironment(createDirectories bool) string {
+	sb := fmt.Sprintf("/tmp/second-brain-cli-%d", time.Now().UnixNano())
+
+	if createDirectories {
+		os.Mkdir(sb, 0700)
+		os.Mkdir(filepath.Join(sb, "inbox"), 0700)
+		os.Mkdir(filepath.Join(sb, "journal"), 0700)
+	}
 
 	os.Clearenv()
 	os.Setenv("SB", sb)
