@@ -25,7 +25,7 @@ type Configuration struct {
 func GetConfig() Configuration {
 	userHomeDir, _ := os.UserHomeDir()
 
-	rootDir := getEnv("SB", fmt.Sprintf("%s/SecondBrain", userHomeDir))
+	rootDir := getEnv("SB", fmt.Sprintf("%s/notes", userHomeDir))
 	inboxDir := getEnv("SB_INBOX", fmt.Sprintf("%s/inbox", rootDir))
 	journalDir := getEnv("SB_JOURNAL", fmt.Sprintf("%s/journal", rootDir))
 

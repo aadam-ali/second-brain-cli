@@ -35,7 +35,7 @@ func TestGetConfigDefaultValues(t *testing.T) {
 
 	os.Clearenv()
 	os.Setenv("HOME", "/home/test")
-	rootDir := "/home/test/SecondBrain"
+	rootDir := "/home/test/notes"
 
 	want := Configuration{
 		RootDir:       rootDir,
