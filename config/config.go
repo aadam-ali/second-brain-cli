@@ -25,22 +25,18 @@ type Configuration struct {
 func GetConfig() Configuration {
 	userHomeDir, _ := os.UserHomeDir()
 
-	rootDir := getEnv("SB", fmt.Sprintf("%s/SecondBrain", userHomeDir))
+	rootDir := getEnv("SB", fmt.Sprintf("%s/notes", userHomeDir))
 	inboxDir := getEnv("SB_INBOX", fmt.Sprintf("%s/inbox", rootDir))
-	journalDir := getEnv("SB_JOURNAL", fmt.Sprintf("%s/journal", rootDir))
 
 	today := Now().Format("2006-01-02")
 	dayOfWeek := Now().Weekday().String()
-	dailyNotePath := fmt.Sprintf("%s/%s.md", journalDir, today)
 
 	return Configuration{
-		RootDir:       rootDir,
-		InboxDir:      inboxDir,
-		JournalDir:    journalDir,
-		DailyNotePath: dailyNotePath,
-		DayOfWeek:     dayOfWeek,
-		Today:         today,
-		Version:       version,
+		RootDir:   rootDir,
+		InboxDir:  inboxDir,
+		DayOfWeek: dayOfWeek,
+		Today:     today,
+		Version:   version,
 	}
 }
 
