@@ -25,8 +25,12 @@ func ConstructNotePath(dir string, title string) string {
 	return filepath.Join(dir, titleWithExtension)
 }
 
-func CreateNote(filepath string, content string) {
-	f, _ := os.Create(filepath)
+func CreateNote(pathToFile string, content string) {
+	if err := os.MkdirAll(filepath.Dir(pathToFile), 0770); err != nil {
+		return
+	}
+
+	f, _ := os.Create(pathToFile)
 	defer f.Close()
 
 	_, err := f.Write([]byte(content))
@@ -38,6 +42,10 @@ func CreateNote(filepath string, content string) {
 
 func CheckIfNoteExists(rootDir string, name string) (bool, string) {
 	pathToNote := ""
+
+	if _, err := os.Stat(rootDir); err != nil {
+		return false, ""
+	}
 
 	err := filepath.WalkDir(rootDir, func(path string, d fs.DirEntry, err error) error {
 		if !d.IsDir() && strings.EqualFold(name, d.Name()) {

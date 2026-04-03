@@ -1,9 +1,11 @@
 package internal
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -96,6 +98,14 @@ func TestCheckIfNoteExistsReturnPathWhenExists(t *testing.T) {
 func TestCheckIfNoteExistsReturnsEmptyStringWhenNotExists(t *testing.T) {
 	rootDir, _, _ := createNoteInTempDir("this-one-exists", false)
 	defer os.RemoveAll(rootDir)
+
+	_, got := CheckIfNoteExists(rootDir, "but-this-one-does-not"+".md")
+
+	assert.Empty(t, got)
+}
+
+func TestCheckIfNoteExistsReturnsEmptyStringWhenDirNotExists(t *testing.T) {
+	rootDir := fmt.Sprintf("/tmp/this-dir-does-not-exist-%d", time.Now().UnixNano())
 
 	_, got := CheckIfNoteExists(rootDir, "but-this-one-does-not"+".md")
 
