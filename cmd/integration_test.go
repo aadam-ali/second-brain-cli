@@ -50,7 +50,7 @@ func TestNewCmd(t *testing.T) {
 			defer os.RemoveAll(sb)
 
 			var wantError error
-			wantStdoutFilepath := filepath.Join(sb, "inbox", "20250713 "+tt.sanitisedTitle+".md")
+			wantStdoutFilepath := filepath.Join(sb, "inbox", "2025-07-13 "+tt.sanitisedTitle+".md")
 
 			newCmd.Flags().Set("no-open", "true")
 			gotStdout, _, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})

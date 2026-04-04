@@ -25,14 +25,14 @@ func newCmdFunction(cmd *cobra.Command, args []string) error {
 	sanitisedTitle := internal.SanitiseTitle(title)
 
 	if dateFlag, _ := cmd.Flags().GetBool("no-date"); !dateFlag {
-		sanitisedTitle = config.Now().Format("20060102 ") + sanitisedTitle
+		sanitisedTitle = cfg.Today + " " + sanitisedTitle
 	}
 
 	noteExists, existingNoteFilepath := internal.CheckIfNoteExists(cfg.RootDir, sanitisedTitle+".md")
 
 	if !noteExists {
 		filepath = internal.ConstructNotePath(cfg.InboxDir, sanitisedTitle)
-		content := renderStdNoteContent(title)
+		content := renderStdNoteContent(title, cfg.Today)
 		internal.CreateNote(filepath, content)
 
 		fmt.Println(filepath)
@@ -53,6 +53,6 @@ var newCmd = &cobra.Command{
 	Args:  cobra.MatchAll(cobra.ExactArgs(1)),
 	RunE:  newCmdFunction}
 
-func renderStdNoteContent(title string) string {
-	return fmt.Sprintf("---\ntitle: %s\n---\n", title)
+func renderStdNoteContent(title string, date string) string {
+	return fmt.Sprintf("---\ntitle: %s\ndate: %s\n---\n", title, date)
 }
