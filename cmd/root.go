@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"log"
 	"os"
 
 	"github.com/aadam-ali/second-brain-cli/config"
@@ -18,12 +17,8 @@ var rootCmd = &cobra.Command{
 		os.MkdirAll(config.InboxDir, 0755)
 		os.MkdirAll(config.JournalDir, 0755)
 	},
-	Run: func(cmd *cobra.Command, args []string) {
-		err := cmd.Help()
-
-		if err != nil {
-			log.Fatal(err)
-		}
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return cmd.Help()
 	},
 }
 
