@@ -33,7 +33,9 @@ func newCmdFunction(cmd *cobra.Command, args []string) error {
 	if !noteExists {
 		filepath = internal.ConstructNotePath(cfg.InboxDir, sanitisedTitle)
 		content := renderStdNoteContent(title, cfg.Today)
-		internal.CreateNote(filepath, content)
+		if err := internal.CreateNote(filepath, content); err != nil {
+			return fmt.Errorf("create note: %w", err)
+		}
 
 		fmt.Println(filepath)
 	} else {

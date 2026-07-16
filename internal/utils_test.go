@@ -68,11 +68,16 @@ Some content
 	}
 
 	for _, tt := range testCases {
-		path, _ := os.MkdirTemp("", "second-brain-cli")
+		path, err := os.MkdirTemp("", "second-brain-cli")
+		if err != nil {
+			t.Fatal(err)
+		}
 		filepath := filepath.Join(path, tt.filename)
 
-		CreateNote(filepath, tt.content)
-		got, _ := os.ReadFile(filepath)
+		err = CreateNote(filepath, tt.content)
+		assert.NoError(t, err)
+		got, err := os.ReadFile(filepath)
+		assert.NoError(t, err)
 
 		os.RemoveAll(path)
 
@@ -86,7 +91,7 @@ func TestCheckIfNoteExistsReturnPathWhenExists(t *testing.T) {
 	for _, tt := range testCases {
 		title := "matching-title"
 
-		rootDir, _, want := createNoteInTempDir(title, tt)
+		rootDir, _, want := createNoteInTempDir(t, title, tt)
 		defer os.RemoveAll(rootDir)
 
 		_, got := CheckIfNoteExists(rootDir, title+".md")
@@ -96,7 +101,7 @@ func TestCheckIfNoteExistsReturnPathWhenExists(t *testing.T) {
 }
 
 func TestCheckIfNoteExistsReturnsEmptyStringWhenNotExists(t *testing.T) {
-	rootDir, _, _ := createNoteInTempDir("this-one-exists", false)
+	rootDir, _, _ := createNoteInTempDir(t, "this-one-exists", false)
 	defer os.RemoveAll(rootDir)
 
 	_, got := CheckIfNoteExists(rootDir, "but-this-one-does-not"+".md")
@@ -128,7 +133,7 @@ func TestCheckIfNoteExistsReturnsBool(t *testing.T) {
 
 	for _, tt := range testCases {
 
-		rootDir, _, _ := createNoteInTempDir(tt.createTitle, tt.nested)
+		rootDir, _, _ := createNoteInTempDir(t, tt.createTitle, tt.nested)
 		defer os.RemoveAll(rootDir)
 
 		got, _ := CheckIfNoteExists(rootDir, tt.expectedTitle+".md")

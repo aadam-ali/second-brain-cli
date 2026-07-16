@@ -24,19 +24,23 @@ func ConstructNotePath(dir string, title string) string {
 	return filepath.Join(dir, titleWithExtension)
 }
 
-func CreateNote(pathToFile string, content string) {
+func CreateNote(pathToFile string, content string) error {
 	if err := os.MkdirAll(filepath.Dir(pathToFile), 0770); err != nil {
-		return
+		return fmt.Errorf("create dir: %w", err)
 	}
 
-	f, _ := os.Create(pathToFile)
+	f, err := os.Create(pathToFile)
+	if err != nil {
+		return fmt.Errorf("create file: %w", err)
+	}
 	defer f.Close()
 
-	_, err := f.Write([]byte(content))
+	_, err = f.Write([]byte(content))
 	if err != nil {
-		errMsg := fmt.Sprintf("Failed to create note: %s", err)
-		log.Fatal(errMsg)
+		return fmt.Errorf("write note: %w", err)
 	}
+
+	return nil
 }
 
 func CheckIfNoteExists(rootDir string, name string) (bool, string) {
