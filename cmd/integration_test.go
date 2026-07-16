@@ -260,6 +260,49 @@ func TestLinkCmd(t *testing.T) {
 	}
 }
 
+func TestNewCmdCreateNoteError(t *testing.T) {
+	sb := prepareEnvironment(t, true)
+	defer os.RemoveAll(sb)
+
+	os.Setenv("SB", "/dev/null")
+	config.Now = func() time.Time {
+		return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
+	}
+
+	newCmd.Flags().Set("no-open", "true")
+	newCmd.Flags().Set("no-date", "true")
+	_, _, gotError := captureOutput(t, newCmdFunction, newCmd, []string{"test-title"})
+
+	assert.Error(t, gotError)
+	assert.ErrorContains(t, gotError, "create note")
+}
+
+func TestLinkCmdDestNotFound(t *testing.T) {
+	sb := prepareEnvironment(t, true)
+	defer os.RemoveAll(sb)
+
+	src := filepath.Join(sb, "inbox", "exists.md")
+	dest := filepath.Join(sb, "inbox", "does-not-exist.md")
+	os.Create(src)
+
+	_, _, gotError := captureOutput(t, linkCmdFunction, linkCmd, []string{src, dest})
+	assert.Error(t, gotError)
+	assert.ErrorContains(t, gotError, "access dest")
+}
+
+func TestLinkCmdSrcNotFound(t *testing.T) {
+	sb := prepareEnvironment(t, true)
+	defer os.RemoveAll(sb)
+
+	src := filepath.Join(sb, "inbox", "does-not-exist.md")
+	dest := filepath.Join(sb, "inbox", "exists.md")
+	os.Create(dest)
+
+	_, _, gotError := captureOutput(t, linkCmdFunction, linkCmd, []string{src, dest})
+	assert.Error(t, gotError)
+	assert.ErrorContains(t, gotError, "access src")
+}
+
 func TestLinkCmdWikiLink(t *testing.T) {
 	var testCases = []string{
 		"bonjour-world",

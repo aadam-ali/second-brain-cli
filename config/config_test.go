@@ -51,6 +51,41 @@ func TestGetConfigDefaultValues(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
+func TestResolveEditorDefaults(t *testing.T) {
+	os.Unsetenv("VISUAL")
+	os.Unsetenv("EDITOR")
+
+	got := resolveEditor()
+	assert.Equal(t, "vim", got)
+}
+
+func TestResolveEditorUsesVISUAL(t *testing.T) {
+	os.Setenv("VISUAL", "nano")
+	defer os.Unsetenv("VISUAL")
+
+	got := resolveEditor()
+	assert.Equal(t, "nano", got)
+}
+
+func TestResolveEditorFallsBackToEDITOR(t *testing.T) {
+	os.Unsetenv("VISUAL")
+	os.Setenv("EDITOR", "emacs")
+	defer os.Unsetenv("EDITOR")
+
+	got := resolveEditor()
+	assert.Equal(t, "emacs", got)
+}
+
+func TestResolveEditorVISUALOverridesEDITOR(t *testing.T) {
+	os.Setenv("VISUAL", "code --wait")
+	os.Setenv("EDITOR", "vim")
+	defer os.Unsetenv("VISUAL")
+	defer os.Unsetenv("EDITOR")
+
+	got := resolveEditor()
+	assert.Equal(t, "code --wait", got)
+}
+
 func TestGetConfigOverriddenValues(t *testing.T) {
 	Now = func() time.Time {
 		return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)

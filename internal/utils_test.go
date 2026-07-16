@@ -120,6 +120,30 @@ func TestCheckIfNoteExistsReturnsEmptyStringWhenDirNotExists(t *testing.T) {
 	assert.Empty(t, got)
 }
 
+func TestOpenFileInEditorWithMissingBinary(t *testing.T) {
+	err := OpenFileInEditor("nonexistent-binary-abc123", "/tmp", "/tmp/test.md")
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, ErrEditorLaunch)
+}
+
+func TestOpenFileInEditorWithFailingBinary(t *testing.T) {
+	err := OpenFileInEditor("false", "/tmp", "/tmp/test.md")
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, ErrEditorLaunch)
+}
+
+func TestCreateNoteMkdirAllError(t *testing.T) {
+	err := CreateNote("/dev/null/test.md", "content")
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "create dir")
+}
+
+func TestCreateNoteWriteError(t *testing.T) {
+	err := CreateNote("/dev/full", "content")
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "write note")
+}
+
 func TestCheckIfNoteExistsReturnsBool(t *testing.T) {
 
 	var testCases = []struct {
