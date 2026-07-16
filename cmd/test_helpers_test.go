@@ -6,24 +6,33 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"testing"
 	"time"
 
 	"github.com/spf13/cobra"
 )
 
-func captureOutput(fn func(cmd *cobra.Command, args []string) error, cmd *cobra.Command, args []string) (string, string, error) {
+func captureOutput(t *testing.T, fn func(cmd *cobra.Command, args []string) error, cmd *cobra.Command, args []string) (string, string, error) {
+	t.Helper()
+
 	originalStdout := os.Stdout
 	originalStderr := os.Stderr
 
 	var bufOut bytes.Buffer
-	r1, w1, _ := os.Pipe()
+	r1, w1, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
 	os.Stdout = w1
 
 	var bufErr bytes.Buffer
-	r2, w2, _ := os.Pipe()
+	r2, w2, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
 	os.Stderr = w2
 
-	err := fn(cmd, args)
+	err = fn(cmd, args)
 
 	w1.Close()
 	os.Stdout = originalStdout

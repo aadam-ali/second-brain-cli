@@ -14,7 +14,7 @@ import (
 func TestVersionCmd(t *testing.T) {
 	wantStdout := "sb development\n"
 
-	gotStdout, _, gotError := captureOutput(versionCmdFunction, versionCmd, []string{})
+	gotStdout, _, gotError := captureOutput(t, versionCmdFunction, versionCmd, []string{})
 
 	assert.NoError(t, gotError)
 	assert.Equal(t, wantStdout, gotStdout)
@@ -53,7 +53,7 @@ func TestNewCmd(t *testing.T) {
 			wantStdoutFilepath := filepath.Join(sb, "inbox", "2025-07-13 "+tt.sanitisedTitle+".md")
 
 			newCmd.Flags().Set("no-open", "true")
-			gotStdout, _, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})
+			gotStdout, _, gotError := captureOutput(t, newCmdFunction, newCmd, []string{tt.inputTitle})
 			_, newNoteErr := os.Stat(wantStdoutFilepath)
 
 			assert.Equal(t, wantError, gotError)
@@ -80,7 +80,7 @@ func TestNewCmdNoDateFlag(t *testing.T) {
 
 		newCmd.Flags().Set("no-open", "true")
 		newCmd.Flags().Set("no-date", "true")
-		gotStdout, _, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})
+		gotStdout, _, gotError := captureOutput(t, newCmdFunction, newCmd, []string{tt.inputTitle})
 		_, newNoteErr := os.Stat(wantStdoutFilepath)
 
 		assert.Equal(t, wantError, gotError)
@@ -112,7 +112,7 @@ func TestNewCmdExistingNote(t *testing.T) {
 
 		newCmd.Flags().Set("no-open", "true")
 		newCmd.Flags().Set("no-date", "true")
-		_, _, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})
+		_, _, gotError := captureOutput(t, newCmdFunction, newCmd, []string{tt.inputTitle})
 		_, newNoteErr := os.Stat(wantStdoutFilepath)
 
 		assert.NoError(t, newNoteErr)
@@ -132,7 +132,7 @@ func TestDailyCmd(t *testing.T) {
 ---
 `
 
-	gotStdout, _, gotError := captureOutput(dailyCmdFunction, dailyCmd, []string{})
+	gotStdout, _, gotError := captureOutput(t, dailyCmdFunction, dailyCmd, []string{})
 
 	assert.Equal(t, wantStdout, gotStdout)
 	assert.NoError(t, gotError)
@@ -154,7 +154,7 @@ func TestPathCmdExists(t *testing.T) {
 		wantStdoutFilepath := filepath.Join(sb, tt.filepathOutput)
 		os.Create(wantStdoutFilepath)
 
-		gotStdout, _, gotError := captureOutput(pathCmdFunction, pathCmd, []string{tt.filenameInput})
+		gotStdout, _, gotError := captureOutput(t, pathCmdFunction, pathCmd, []string{tt.filenameInput})
 		_, statErr := os.Stat(wantStdoutFilepath)
 
 		assert.Contains(t, gotStdout, wantStdoutFilepath)
@@ -178,7 +178,7 @@ func TestPathCmdWikiLink(t *testing.T) {
 		os.Create(wantStdoutFilepath)
 
 		pathCmd.Flags().Set("wiki", "true")
-		gotStdout, _, gotError := captureOutput(pathCmdFunction, pathCmd, []string{tt})
+		gotStdout, _, gotError := captureOutput(t, pathCmdFunction, pathCmd, []string{tt})
 		_, statErr := os.Stat(wantStdoutFilepath)
 
 		assert.Contains(t, gotStdout, wantStdoutFilepath)
@@ -202,7 +202,7 @@ func TestPathCmdDoesNotExist(t *testing.T) {
 
 		wantStdoutFilepath := filepath.Join(sb, tt.filepathOutput)
 
-		_, _, gotError := captureOutput(pathCmdFunction, pathCmd, []string{tt.filenameInput})
+		_, _, gotError := captureOutput(t, pathCmdFunction, pathCmd, []string{tt.filenameInput})
 		_, statErr := os.Stat(wantStdoutFilepath)
 
 		assert.Error(t, statErr)
@@ -224,7 +224,7 @@ func TestPathCmdDoesNotExistWikiLink(t *testing.T) {
 		wantStdoutFilepath := filepath.Join(sb, tt+".md")
 
 		pathCmd.Flags().Set("wiki", "true")
-		_, _, gotError := captureOutput(pathCmdFunction, pathCmd, []string{tt})
+		_, _, gotError := captureOutput(t, pathCmdFunction, pathCmd, []string{tt})
 		_, statErr := os.Stat(wantStdoutFilepath)
 
 		assert.Error(t, statErr)
@@ -253,7 +253,7 @@ func TestLinkCmd(t *testing.T) {
 		os.Create(dest)
 
 		wantOutput := fmt.Sprintf("[%s](../journal/%s)", tt.destFilenameWithoutExtension, tt.urlEncodedDestFilename)
-		gotOutput, _, gotError := captureOutput(linkCmdFunction, linkCmd, []string{src, dest})
+		gotOutput, _, gotError := captureOutput(t, linkCmdFunction, linkCmd, []string{src, dest})
 
 		assert.NoError(t, gotError)
 		assert.Equal(t, wantOutput, gotOutput)
@@ -279,7 +279,7 @@ func TestLinkCmdWikiLink(t *testing.T) {
 		wantOutput := fmt.Sprintf("[[%s]]", tt)
 
 		linkCmd.Flags().Set("wiki", "true")
-		gotOutput, _, gotError := captureOutput(linkCmdFunction, linkCmd, []string{src, dest})
+		gotOutput, _, gotError := captureOutput(t, linkCmdFunction, linkCmd, []string{src, dest})
 
 		assert.NoError(t, gotError)
 		assert.Equal(t, wantOutput, gotOutput)
