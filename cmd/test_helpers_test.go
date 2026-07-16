@@ -45,13 +45,21 @@ func captureOutput(t *testing.T, fn func(cmd *cobra.Command, args []string) erro
 	return bufOut.String(), bufErr.String(), err
 }
 
-func prepareEnvironment(createDirectories bool) string {
+func prepareEnvironment(t *testing.T, createDirectories bool) string {
+	t.Helper()
+
 	sb := fmt.Sprintf("/tmp/second-brain-cli-%d", time.Now().UnixNano())
 
 	if createDirectories {
-		os.Mkdir(sb, 0700)
-		os.Mkdir(filepath.Join(sb, "inbox"), 0700)
-		os.Mkdir(filepath.Join(sb, "journal"), 0700)
+		if err := os.Mkdir(sb, 0700); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Mkdir(filepath.Join(sb, "inbox"), 0700); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Mkdir(filepath.Join(sb, "journal"), 0700); err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	os.Clearenv()

@@ -46,7 +46,7 @@ func TestNewCmd(t *testing.T) {
 				return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
 			}
 
-			sb := prepareEnvironment(createDirectoriesFlag)
+			sb := prepareEnvironment(t, createDirectoriesFlag)
 			defer os.RemoveAll(sb)
 
 			var wantError error
@@ -72,7 +72,7 @@ func TestNewCmdNoDateFlag(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment(true)
+		sb := prepareEnvironment(t, true)
 		defer os.RemoveAll(sb)
 
 		var wantError error
@@ -103,7 +103,7 @@ func TestNewCmdExistingNote(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment(true)
+		sb := prepareEnvironment(t, true)
 		defer os.RemoveAll(sb)
 
 		wantStdoutFilepath := filepath.Join(sb, "inbox", "Hello World"+".md")
@@ -148,7 +148,7 @@ func TestPathCmdExists(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment(true)
+		sb := prepareEnvironment(t, true)
 		defer os.RemoveAll(sb)
 
 		wantStdoutFilepath := filepath.Join(sb, tt.filepathOutput)
@@ -171,7 +171,7 @@ func TestPathCmdWikiLink(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment(true)
+		sb := prepareEnvironment(t, true)
 		defer os.RemoveAll(sb)
 
 		wantStdoutFilepath := filepath.Join(sb, tt+".md")
@@ -197,7 +197,7 @@ func TestPathCmdDoesNotExist(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment(true)
+		sb := prepareEnvironment(t, true)
 		defer os.RemoveAll(sb)
 
 		wantStdoutFilepath := filepath.Join(sb, tt.filepathOutput)
@@ -218,7 +218,7 @@ func TestPathCmdDoesNotExistWikiLink(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment(true)
+		sb := prepareEnvironment(t, true)
 		defer os.RemoveAll(sb)
 
 		wantStdoutFilepath := filepath.Join(sb, tt+".md")
@@ -243,7 +243,7 @@ func TestLinkCmd(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment(true)
+		sb := prepareEnvironment(t, true)
 		defer os.RemoveAll(sb)
 
 		src := filepath.Join(sb, "inbox", "hello-world.md")
@@ -267,7 +267,7 @@ func TestLinkCmdWikiLink(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		sb := prepareEnvironment(true)
+		sb := prepareEnvironment(t, true)
 		defer os.RemoveAll(sb)
 
 		src := filepath.Join(sb, "inbox", "hello-world.md")
