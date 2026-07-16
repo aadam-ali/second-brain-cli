@@ -18,13 +18,20 @@ func init() {
 func newCmdFunction(cmd *cobra.Command, args []string) error {
 	cfg := config.GetConfig()
 
-	noOpen, _ := cmd.Flags().GetBool("no-open")
+	noOpen, err := cmd.Flags().GetBool("no-open")
+	if err != nil {
+		return fmt.Errorf("flag no-open: %w", err)
+	}
 	var filepath string
 	title := args[0]
 
 	sanitisedTitle := internal.SanitiseTitle(title)
 
-	if dateFlag, _ := cmd.Flags().GetBool("no-date"); !dateFlag {
+	dateFlag, err := cmd.Flags().GetBool("no-date")
+	if err != nil {
+		return fmt.Errorf("flag no-date: %w", err)
+	}
+	if !dateFlag {
 		sanitisedTitle = cfg.Today + " " + sanitisedTitle
 	}
 

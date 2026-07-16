@@ -19,9 +19,16 @@ func pathCmdFunction(cmd *cobra.Command, args []string) error {
 	cfg := config.GetConfig()
 	title := args[0]
 
-	urlDecodedTitle, _ := url.PathUnescape(title)
+	urlDecodedTitle, err := url.PathUnescape(title)
+	if err != nil {
+		return fmt.Errorf("url decode title: %w", err)
+	}
 
-	if isWikiLink, _ := cmd.Flags().GetBool("wiki"); isWikiLink {
+	isWikiLink, err := cmd.Flags().GetBool("wiki")
+	if err != nil {
+		return fmt.Errorf("flag wiki: %w", err)
+	}
+	if isWikiLink {
 		urlDecodedTitle += ".md"
 	}
 

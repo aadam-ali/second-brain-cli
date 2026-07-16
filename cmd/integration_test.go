@@ -253,7 +253,7 @@ func TestLinkCmd(t *testing.T) {
 		os.Create(dest)
 
 		wantOutput := fmt.Sprintf("[%s](../journal/%s)", tt.destFilenameWithoutExtension, tt.urlEncodedDestFilename)
-		gotOutput, _, gotError := captureOutput(linkCmdFunction, newCmd, []string{src, dest})
+		gotOutput, _, gotError := captureOutput(linkCmdFunction, linkCmd, []string{src, dest})
 
 		assert.NoError(t, gotError)
 		assert.Equal(t, wantOutput, gotOutput)

@@ -31,7 +31,11 @@ func linkCmdFunction(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("access src: %w", err)
 	}
 
-	if useWikiLink, _ := cmd.Flags().GetBool("wiki"); useWikiLink {
+	useWikiLink, err := cmd.Flags().GetBool("wiki")
+	if err != nil {
+		return fmt.Errorf("flag wiki: %w", err)
+	}
+	if useWikiLink {
 		fmt.Printf("[[%s]]", destTitle)
 
 		return nil
