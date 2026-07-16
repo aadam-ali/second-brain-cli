@@ -44,6 +44,7 @@ func TestGetConfigDefaultValues(t *testing.T) {
 		DayOfWeek:  "Sunday",
 		Today:      "2025-07-13",
 		Version:    "development",
+		Editor:     "vim",
 	}
 	got := GetConfig()
 
@@ -70,6 +71,7 @@ func TestGetConfigOverriddenValues(t *testing.T) {
 		DayOfWeek:  "Sunday",
 		Today:      "2025-07-13",
 		Version:    "development",
+		Editor:     "vim",
 	}
 
 	got := GetConfig()

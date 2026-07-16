@@ -65,14 +65,16 @@ func CheckIfNoteExists(rootDir string, name string) (bool, string, error) {
 	return false, "", nil
 }
 
-func OpenFileInVim(rootDir string, filepath string) error {
-	cmd := exec.Command("nvim", filepath)
+func OpenFileInEditor(editor string, rootDir string, filepath string) error {
+	parts := strings.Fields(editor)
+	args := append(parts[1:], filepath)
+	cmd := exec.Command(parts[0], args...)
 	cmd.Dir = rootDir
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("%w: %w", ErrVimLaunch, err)
+		return fmt.Errorf("%w: %w", ErrEditorLaunch, err)
 	}
 
 	return nil

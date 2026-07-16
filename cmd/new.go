@@ -54,7 +54,7 @@ func newCmdFunction(cmd *cobra.Command, args []string) error {
 	}
 
 	if !noOpen {
-		if err := internal.OpenFileInVim(cfg.RootDir, notePath); err != nil {
+		if err := internal.OpenFileInEditor(cfg.Editor, cfg.RootDir, notePath); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 		}
 	}

@@ -18,6 +18,7 @@ type Configuration struct {
 	DayOfWeek     string
 	Today         string
 	Version       string
+	Editor        string
 }
 
 // GetConfig returns the Conifugration struct by reading environment
@@ -42,7 +43,18 @@ func GetConfig() Configuration {
 		DayOfWeek:  dayOfWeek,
 		Today:      today,
 		Version:    version,
+		Editor:     resolveEditor(),
 	}
+}
+
+func resolveEditor() string {
+	if v := os.Getenv("VISUAL"); v != "" {
+		return v
+	}
+	if v := os.Getenv("EDITOR"); v != "" {
+		return v
+	}
+	return "vim"
 }
 
 func getEnv(key string, defaultValue string) string {
