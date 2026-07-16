@@ -23,7 +23,7 @@ func newCmdFunction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("flag no-open: %w", err)
 	}
-	var filepath string
+	var notePath string
 	title := args[0]
 
 	sanitisedTitle := internal.SanitiseTitle(title)
@@ -42,19 +42,19 @@ func newCmdFunction(cmd *cobra.Command, args []string) error {
 	}
 
 	if !noteExists {
-		filepath = internal.ConstructNotePath(cfg.InboxDir, sanitisedTitle)
+		notePath = internal.ConstructNotePath(cfg.InboxDir, sanitisedTitle)
 		content := renderStdNoteContent(title, cfg.Today)
-		if err := internal.CreateNote(filepath, content); err != nil {
+		if err := internal.CreateNote(notePath, content); err != nil {
 			return fmt.Errorf("create note: %w", err)
 		}
 
-		fmt.Println(filepath)
+		fmt.Println(notePath)
 	} else {
 		return fmt.Errorf("%w: %q at %s", internal.ErrNoteExists, sanitisedTitle, existingNoteFilepath)
 	}
 
 	if !noOpen {
-		if err := internal.OpenFileInVim(cfg.RootDir, filepath); err != nil {
+		if err := internal.OpenFileInVim(cfg.RootDir, notePath); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 		}
 	}
