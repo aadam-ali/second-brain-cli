@@ -73,6 +73,6 @@ func OpenFileInVim(rootDir string, filepath string) {
 	err := cmd.Run()
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 	}
 }
