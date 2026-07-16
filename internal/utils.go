@@ -3,7 +3,6 @@ package internal
 import (
 	"fmt"
 	"io/fs"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -43,11 +42,11 @@ func CreateNote(pathToFile string, content string) error {
 	return nil
 }
 
-func CheckIfNoteExists(rootDir string, name string) (bool, string) {
+func CheckIfNoteExists(rootDir string, name string) (bool, string, error) {
 	pathToNote := ""
 
 	if _, err := os.Stat(rootDir); err != nil {
-		return false, ""
+		return false, "", nil
 	}
 
 	err := filepath.WalkDir(rootDir, func(path string, d fs.DirEntry, err error) error {
@@ -57,13 +56,13 @@ func CheckIfNoteExists(rootDir string, name string) (bool, string) {
 		return nil
 	})
 	if err != nil {
-		log.Fatal(err)
+		return false, "", err
 	}
 
 	if pathToNote != "" {
-		return true, pathToNote
+		return true, pathToNote, nil
 	}
-	return false, ""
+	return false, "", nil
 }
 
 func OpenFileInVim(rootDir string, filepath string) {

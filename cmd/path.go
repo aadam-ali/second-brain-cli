@@ -25,7 +25,10 @@ func pathCmdFunction(cmd *cobra.Command, args []string) error {
 		urlDecodedTitle += ".md"
 	}
 
-	noteExists, filepath := internal.CheckIfNoteExists(cfg.RootDir, urlDecodedTitle)
+	noteExists, filepath, err := internal.CheckIfNoteExists(cfg.RootDir, urlDecodedTitle)
+	if err != nil {
+		return fmt.Errorf("check note: %w", err)
+	}
 
 	if !noteExists {
 		return fmt.Errorf("%w: %q (%s)", internal.ErrNoteNotFound, args[0], title)

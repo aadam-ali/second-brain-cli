@@ -28,7 +28,10 @@ func newCmdFunction(cmd *cobra.Command, args []string) error {
 		sanitisedTitle = cfg.Today + " " + sanitisedTitle
 	}
 
-	noteExists, existingNoteFilepath := internal.CheckIfNoteExists(cfg.RootDir, sanitisedTitle+".md")
+	noteExists, existingNoteFilepath, err := internal.CheckIfNoteExists(cfg.RootDir, sanitisedTitle+".md")
+	if err != nil {
+		return fmt.Errorf("check note: %w", err)
+	}
 
 	if !noteExists {
 		filepath = internal.ConstructNotePath(cfg.InboxDir, sanitisedTitle)
