@@ -107,18 +107,17 @@ func TestNewCmdExistingNote(t *testing.T) {
 		defer os.RemoveAll(sb)
 
 		wantStdoutFilepath := filepath.Join(sb, "inbox", "Hello World"+".md")
-		wantStderr := fmt.Sprintf("Note with title %q already exists at %s", tt.sanitisedTitle, wantStdoutFilepath)
 
 		os.Create(wantStdoutFilepath)
 
 		newCmd.Flags().Set("no-open", "true")
 		newCmd.Flags().Set("no-date", "true")
-		_, gotStderr, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})
+		_, _, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})
 		_, newNoteErr := os.Stat(wantStdoutFilepath)
 
-		assert.Contains(t, gotStderr, wantStderr)
 		assert.NoError(t, newNoteErr)
-		assert.ErrorContains(t, gotError, wantStderr)
+		assert.ErrorContains(t, gotError, "note already exists")
+		assert.ErrorContains(t, gotError, tt.sanitisedTitle)
 	}
 }
 func TestDailyCmd(t *testing.T) {
@@ -202,14 +201,13 @@ func TestPathCmdDoesNotExist(t *testing.T) {
 		defer os.RemoveAll(sb)
 
 		wantStdoutFilepath := filepath.Join(sb, tt.filepathOutput)
-		wantStderr := fmt.Sprintf("Note with title \"%[1]s\" (%[1]s) does not exist", tt.filenameInput)
 
-		_, gotStderr, gotError := captureOutput(pathCmdFunction, pathCmd, []string{tt.filenameInput})
+		_, _, gotError := captureOutput(pathCmdFunction, pathCmd, []string{tt.filenameInput})
 		_, statErr := os.Stat(wantStdoutFilepath)
 
-		assert.Contains(t, gotStderr, wantStderr)
 		assert.Error(t, statErr)
-		assert.ErrorContains(t, gotError, wantStderr)
+		assert.ErrorContains(t, gotError, "note not found")
+		assert.ErrorContains(t, gotError, tt.filenameInput)
 	}
 }
 
@@ -224,15 +222,14 @@ func TestPathCmdDoesNotExistWikiLink(t *testing.T) {
 		defer os.RemoveAll(sb)
 
 		wantStdoutFilepath := filepath.Join(sb, tt+".md")
-		wantStderr := fmt.Sprintf("Note with title \"%[1]s\" (%[1]s) does not exist", tt)
 
 		pathCmd.Flags().Set("wiki", "true")
-		_, gotStderr, gotError := captureOutput(pathCmdFunction, pathCmd, []string{tt})
+		_, _, gotError := captureOutput(pathCmdFunction, pathCmd, []string{tt})
 		_, statErr := os.Stat(wantStdoutFilepath)
 
-		assert.Contains(t, gotStderr, wantStderr)
 		assert.Error(t, statErr)
-		assert.ErrorContains(t, gotError, wantStderr)
+		assert.ErrorContains(t, gotError, "note not found")
+		assert.ErrorContains(t, gotError, tt)
 	}
 }
 

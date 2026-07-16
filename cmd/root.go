@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/aadam-ali/second-brain-cli/config"
 	"github.com/spf13/cobra"
 )
 
@@ -11,8 +12,11 @@ var rootCmd = &cobra.Command{
 	Use:   "sb",
 	Short: "sb is a note taking management tool",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		cmd.SilenceErrors = true
 		cmd.SilenceUsage = true
+
+		config := config.GetConfig()
+		os.MkdirAll(config.InboxDir, 0755)
+		os.MkdirAll(config.JournalDir, 0755)
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		err := cmd.Help()

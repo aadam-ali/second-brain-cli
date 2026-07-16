@@ -37,7 +37,7 @@ func newCmdFunction(cmd *cobra.Command, args []string) error {
 
 		fmt.Println(filepath)
 	} else {
-		return internal.GetError("Note with title %q already exists at %s", sanitisedTitle, existingNoteFilepath)
+		return fmt.Errorf("%w: %q at %s", internal.ErrNoteExists, sanitisedTitle, existingNoteFilepath)
 	}
 
 	if !noOpen {

@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/aadam-ali/second-brain-cli/internal"
 	"github.com/spf13/cobra"
 )
 
@@ -25,11 +24,11 @@ func linkCmdFunction(cmd *cobra.Command, args []string) error {
 	destTitle, _ := strings.CutSuffix(destFilename, ".md")
 
 	if _, err := os.Stat(dest); err != nil {
-		return internal.GetError("An error occurred: %s", err.Error())
+		return fmt.Errorf("access dest: %w", err)
 	}
 
 	if _, err := os.Stat(src); err != nil {
-		return internal.GetError("An error occurred: %s", err.Error())
+		return fmt.Errorf("access src: %w", err)
 	}
 
 	if useWikiLink, _ := cmd.Flags().GetBool("wiki"); useWikiLink {
@@ -41,7 +40,7 @@ func linkCmdFunction(cmd *cobra.Command, args []string) error {
 	relpath, err := filepath.Rel(filepath.Dir(src), dest)
 
 	if err != nil {
-		return internal.GetError("An error occurred: %s", err.Error())
+		return fmt.Errorf("resolve relpath: %w", err)
 	}
 
 	urlEncodedFilename := url.PathEscape(destFilename)

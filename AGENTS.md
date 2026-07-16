@@ -18,6 +18,7 @@ CLI notetaking tool used in conjunction with Vim.
 * Use the existing Git config, if not available create one with a generic user and email that can be updated later
 * Included an `Assisted-by` trailer with the name of your model
 * This repo uses trunk based development, make sure tests are passing before making a commit
+* Trunk based development, ensure tests are passing before committing
 
 ## Other Information
 
