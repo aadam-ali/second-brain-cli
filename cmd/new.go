@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/aadam-ali/second-brain-cli/config"
 	"github.com/aadam-ali/second-brain-cli/internal"
@@ -53,7 +54,9 @@ func newCmdFunction(cmd *cobra.Command, args []string) error {
 	}
 
 	if !noOpen {
-		internal.OpenFileInVim(cfg.RootDir, filepath)
+		if err := internal.OpenFileInVim(cfg.RootDir, filepath); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+		}
 	}
 
 	return nil
