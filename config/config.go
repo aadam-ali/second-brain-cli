@@ -23,7 +23,10 @@ type Configuration struct {
 // GetConfig returns the Conifugration struct by reading environment
 // variables and calculating values at runtime
 func GetConfig() Configuration {
-	userHomeDir, _ := os.UserHomeDir()
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		userHomeDir = os.Getenv("HOME")
+	}
 
 	rootDir := getEnv("SB", fmt.Sprintf("%s/notes", userHomeDir))
 	inboxDir := getEnv("SB_INBOX", fmt.Sprintf("%s/inbox", rootDir))
