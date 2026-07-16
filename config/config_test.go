@@ -38,11 +38,12 @@ func TestGetConfigDefaultValues(t *testing.T) {
 	rootDir := "/home/test/notes"
 
 	want := Configuration{
-		RootDir:   rootDir,
-		InboxDir:  rootDir + "/inbox",
-		DayOfWeek: "Sunday",
-		Today:     "2025-07-13",
-		Version:   "development",
+		RootDir:    rootDir,
+		InboxDir:   rootDir + "/inbox",
+		JournalDir: rootDir + "/journal",
+		DayOfWeek:  "Sunday",
+		Today:      "2025-07-13",
+		Version:    "development",
 	}
 	got := GetConfig()
 
@@ -63,11 +64,12 @@ func TestGetConfigOverriddenValues(t *testing.T) {
 	os.Setenv("SB_INBOX", sbInbox)
 
 	want := Configuration{
-		RootDir:   sb,
-		InboxDir:  sbInbox,
-		DayOfWeek: "Sunday",
-		Today:     "2025-07-13",
-		Version:   "development",
+		RootDir:    sb,
+		InboxDir:   sbInbox,
+		JournalDir: sb + "/journal",
+		DayOfWeek:  "Sunday",
+		Today:      "2025-07-13",
+		Version:    "development",
 	}
 
 	got := GetConfig()

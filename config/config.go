@@ -33,13 +33,15 @@ func GetConfig() Configuration {
 
 	today := Now().Format("2006-01-02")
 	dayOfWeek := Now().Weekday().String()
+	journalDir := fmt.Sprintf("%s/journal", rootDir)
 
 	return Configuration{
-		RootDir:   rootDir,
-		InboxDir:  inboxDir,
-		DayOfWeek: dayOfWeek,
-		Today:     today,
-		Version:   version,
+		RootDir:    rootDir,
+		InboxDir:   inboxDir,
+		JournalDir: journalDir,
+		DayOfWeek:  dayOfWeek,
+		Today:      today,
+		Version:    version,
 	}
 }
 
