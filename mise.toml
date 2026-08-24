@@ -24,3 +24,4 @@ run = "go test -v ./..."
 [tasks.build]
 description = "Build"
 run = ["go build -o ./bin/sb -ldflags \"-X github.com/aadam-ali/second-brain-cli/config.version=$(git rev-parse --short HEAD)\" main.go"]
+depends = ["test"]
