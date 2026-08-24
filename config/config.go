@@ -11,13 +11,11 @@ var Now = time.Now
 
 // Configuration holds the configuration settings for the CLI
 type Configuration struct {
-	RootDir       string
-	InboxDir      string
-	JournalDir    string
-	DailyNotePath string
-	DayOfWeek     string
-	Today         string
-	Version       string
+	RootDir   string
+	InboxDir  string
+	DayOfWeek string
+	Today     string
+	Version   string
 }
 
 // GetConfig returns the Conifugration struct by reading environment

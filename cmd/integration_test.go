@@ -129,7 +129,9 @@ func TestDailyCmd(t *testing.T) {
 	wantStdout := `### 2025-07-13 Sunday
 @ <location>
 
-- todo:
+* Todo:
+
+* Notes:
 ---
 `
 
