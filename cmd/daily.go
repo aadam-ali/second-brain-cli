@@ -17,7 +17,9 @@ func dailyCmdFunction(cmd *cobra.Command, args []string) error {
 	fmt.Printf(`### %s %s
 @ <location>
 
-- todo:
+* Todo:
+
+* Notes:
 ---
 `, cfg.Today, cfg.DayOfWeek)
 
