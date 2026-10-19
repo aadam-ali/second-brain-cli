@@ -126,10 +126,6 @@ func todo(cfg Configuration, args []string) (string, error) {
 
 	todoPath, _ = strings.CutSuffix(todoPath, "\n")
 
-	if err != nil {
-		return "", err
-	}
-
 	todoList := filepath.Join(cfg.TodoDir, "TODO.md")
 	if _, err := os.Stat(todoList); err != nil {
 		if _, err := createFile(todoList, fmt.Appendf(nil, "# TODO\n\n")); err != nil {
