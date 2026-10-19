@@ -93,6 +93,10 @@ func new(cfg Configuration, args []string) (string, error) {
 
 	createdFilePath, err := createNote(filePath, title, cfg.Date)
 	if err != nil {
+		if err == NoteExistsError {
+			return createdFilePath + "\n", nil
+		}
+
 		return "", err
 	}
 
@@ -113,16 +117,16 @@ func todo(cfg Configuration, args []string) (string, error) {
 
 	todoPath, err := createNote(filePath, title, cfg.Date)
 	if err != nil {
+		if err == NoteExistsError {
+			return todoPath + "\n", nil
+		}
+
 		return "", err
 	}
 
 	todoPath, _ = strings.CutSuffix(todoPath, "\n")
 
 	if err != nil {
-		if err == NoteExistsError {
-			return todoPath + "\n", nil
-		}
-
 		return "", err
 	}
 
@@ -276,7 +280,7 @@ func createNote(filePath string, title string, date string) (string, error) {
 	}
 
 	if _, err := os.Stat(filePath); err == nil {
-		return absFilePath + "\n", nil
+		return absFilePath, NoteExistsError
 	}
 
 	createdFilePath, err := createFile(absFilePath, fmt.Appendf(nil, `---
