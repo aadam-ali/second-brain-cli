@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/aadam-ali/second-brain-cli/cmd"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -24,11 +23,7 @@ var NoteDoesntExistError = errors.New("note doesn't exist")
 
 func main() {
 	if err := run(os.Args[1:]); err != nil {
-		if err == NotImplementedError {
-			cmd.Execute()
-		} else {
-			os.Exit(1)
-		}
+		os.Exit(1)
 	}
 }
 
