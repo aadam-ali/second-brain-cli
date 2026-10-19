@@ -27,3 +27,4 @@ jobs:
         goversion: "1.27"
         ldflags: -X "config.Version=${{ github.ref_name }}"
         binary_name: "sb"
+        compress_assets: OFF
