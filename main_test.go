@@ -160,3 +160,51 @@ func readLines(path string) []string {
 
 	return lines
 }
+
+func TestPathCmdExists(t *testing.T) {
+	var testCases = []struct {
+		filepathOutput string
+		filenameInput  string
+	}{
+		{"hello-world.md", "hello-world.md"},
+		{"hello world.md", "hello%20world.md"},
+		{"todo/hello world.md", "todo/hello%20world.md"},
+	}
+
+	for _, tt := range testCases {
+		sb := prepareEnvironment(true, []string{})
+		defer os.RemoveAll(sb)
+
+		expectedStdoutFilepath := filepath.Join(sb, tt.filepathOutput)
+		os.Create(expectedStdoutFilepath)
+
+		actualStdout, _, actualError := captureOutput(run, []string{"path", sb, tt.filenameInput})
+
+		assert.Equal(t, expectedStdoutFilepath, actualStdout)
+		assert.NoError(t, actualError)
+		assert.FileExists(t, expectedStdoutFilepath)
+	}
+}
+
+func TestPathCmdDoesNotExist(t *testing.T) {
+	var testCases = []struct {
+		filepathOutput string
+		filenameInput  string
+	}{
+		{"inbox/hello-world.md", "hello-world.md"},
+		{"inbox/hello world.md", "hello%20world.md"},
+	}
+
+	for _, tt := range testCases {
+		sb := prepareEnvironment(true, []string{})
+		defer os.RemoveAll(sb)
+
+		expectedStdoutFilepath := filepath.Join(sb, tt.filepathOutput)
+
+		actualStdout, _, actualError := captureOutput(run, []string{"path", sb, tt.filenameInput})
+
+		assert.ErrorIs(t, NoteDoesntExistError, actualError)
+		assert.Equal(t, "note doesn't exist\n", actualStdout)
+		assert.NoFileExists(t, expectedStdoutFilepath)
+	}
+}
