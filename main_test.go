@@ -109,6 +109,18 @@ func TestLinkCmdNested(t *testing.T) {
 	assert.Equal(t, expectedOutput, actualOutput)
 }
 
+func TestVersionCmd(t *testing.T) {
+	sb := prepareEnvironment(true, []string{})
+	os.RemoveAll(sb)
+
+	expected := "sb development\n"
+
+	actualStdout, _, actualErr := captureOutput(run, []string{"version"})
+
+	assert.Equal(t, expected, actualStdout)
+	assert.NoError(t, actualErr)
+}
+
 // TEST HELPERS
 
 func captureOutput(fn func(args []string) error, args []string) (string, string, error) {

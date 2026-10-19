@@ -14,6 +14,7 @@ import (
 
 // GLOBALS
 
+var Version string = "development"
 var Now = time.Now
 
 var NotImplementedError = errors.New("command isn't implemented")
@@ -25,9 +26,9 @@ func main() {
 	if err := run(os.Args[1:]); err != nil {
 		if err == NotImplementedError {
 			cmd.Execute()
+		} else {
+			os.Exit(1)
 		}
-
-		os.Exit(1)
 	}
 }
 
@@ -53,8 +54,12 @@ func run(args []string) error {
 		if len(args) == 3 {
 			str, err = path(cfg, args[1:])
 		}
+	case "version", "v":
+		if len(args) == 1 {
+			str, err = version(cfg, args[1:])
+		}
 	default:
-		return nil
+		return NotImplementedError
 	}
 
 	if err != nil {
@@ -132,6 +137,10 @@ func path(cfg Configuration, args []string) (string, error) {
 	}
 
 	return absFilePath, nil
+}
+
+func version(cfg Configuration, args []string) (string, error) {
+	return "sb " + Version + "\n", nil
 }
 
 // HELPER
