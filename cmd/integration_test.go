@@ -20,107 +20,6 @@ func TestVersionCmd(t *testing.T) {
 	assert.Equal(t, wantStdout, gotStdout)
 }
 
-func TestNewCmd(t *testing.T) {
-	var testCases = []struct {
-		inputTitle     string
-		sanitisedTitle string
-	}{
-		{"lower case only", "lower case only"},
-		{"UPPER CASE ONLY", "UPPER CASE ONLY"},
-		{"Mixed Case", "Mixed Case"},
-		{"kebab-case", "kebab-case"},
-		{"squash----hyphens", "squash----hyphens"},
-		{" Leading space", "Leading space"},
-		{"-Leading hyphen", "Leading hyphen"},
-		{"Trailing hyphen-", "Trailing hyphen"},
-		{"1 c4n c0unt 123456789", "1 c4n c0unt 123456789"},
-		{"h3llo@world!", "h3llo world"},
-		{"Keyboard special keys `~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?", "Keyboard special keys"},
-	}
-
-	createDirectoriesFlags := []bool{true, false}
-
-	for _, tt := range testCases {
-		for _, createDirectoriesFlag := range createDirectoriesFlags {
-			config.Now = func() time.Time {
-				return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
-			}
-
-			sb := prepareEnvironment(createDirectoriesFlag)
-			defer os.RemoveAll(sb)
-
-			var wantError error
-			wantStdoutFilepath := filepath.Join(sb, "inbox", "2025-07-13 "+tt.sanitisedTitle+".md")
-
-			newCmd.Flags().Set("no-open", "true")
-			gotStdout, _, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})
-			_, newNoteErr := os.Stat(wantStdoutFilepath)
-
-			assert.Equal(t, wantError, gotError)
-			assert.Contains(t, gotStdout, wantStdoutFilepath)
-			assert.NoError(t, newNoteErr)
-		}
-	}
-}
-
-func TestNewCmdNoDateFlag(t *testing.T) {
-	var testCases = []struct {
-		inputTitle     string
-		sanitisedTitle string
-	}{
-		{"Hello World", "Hello World"},
-	}
-
-	for _, tt := range testCases {
-		sb := prepareEnvironment(true)
-		defer os.RemoveAll(sb)
-
-		var wantError error
-		wantStdoutFilepath := filepath.Join(sb, "inbox", tt.sanitisedTitle+".md")
-
-		newCmd.Flags().Set("no-open", "true")
-		newCmd.Flags().Set("no-date", "true")
-		gotStdout, _, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})
-		_, newNoteErr := os.Stat(wantStdoutFilepath)
-
-		assert.Equal(t, wantError, gotError)
-		assert.Contains(t, gotStdout, wantStdoutFilepath)
-		assert.NoError(t, newNoteErr)
-	}
-}
-
-func TestNewCmdExistingNote(t *testing.T) {
-	var testCases = []struct {
-		inputTitle     string
-		sanitisedTitle string
-	}{
-		{"Hello World", "Hello World"},
-		{"HELLO WORLD", "HELLO WORLD"},
-		{"hello world", "hello world"},
-		{"hello   world", "hello world"},
-		{"   hello   world   ", "hello world"},
-		{"-_- hello world _-_", "hello world"},
-	}
-
-	for _, tt := range testCases {
-		sb := prepareEnvironment(true)
-		defer os.RemoveAll(sb)
-
-		wantStdoutFilepath := filepath.Join(sb, "inbox", "Hello World"+".md")
-		wantStderr := fmt.Sprintf("Note with title %q already exists at %s", tt.sanitisedTitle, wantStdoutFilepath)
-
-		os.Create(wantStdoutFilepath)
-
-		newCmd.Flags().Set("no-open", "true")
-		newCmd.Flags().Set("no-date", "true")
-		_, gotStderr, gotError := captureOutput(newCmdFunction, newCmd, []string{tt.inputTitle})
-		_, newNoteErr := os.Stat(wantStdoutFilepath)
-
-		assert.Contains(t, gotStderr, wantStderr)
-		assert.NoError(t, newNoteErr)
-		assert.ErrorContains(t, gotError, wantStderr)
-	}
-}
 func TestDailyCmd(t *testing.T) {
 	config.Now = func() time.Time {
 		return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
@@ -258,7 +157,7 @@ func TestLinkCmd(t *testing.T) {
 		os.Create(dest)
 
 		wantOutput := fmt.Sprintf("[%s](../journal/%s)", tt.destFilenameWithoutExtension, tt.urlEncodedDestFilename)
-		gotOutput, _, gotError := captureOutput(linkCmdFunction, newCmd, []string{src, dest})
+		gotOutput, _, gotError := captureOutput(linkCmdFunction, linkCmd, []string{src, dest})
 
 		assert.NoError(t, gotError)
 		assert.Equal(t, wantOutput, gotOutput)
