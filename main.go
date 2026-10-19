@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/aadam-ali/second-brain-cli/cmd"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -43,6 +44,10 @@ func run(args []string) error {
 		if len(args) > 1 {
 			str, err = new(cfg, args[1:])
 		}
+	case "link", "l":
+		if len(args) == 3 {
+			str, err = link(cfg, args[1:])
+		}
 	default:
 		return nil
 	}
@@ -76,6 +81,31 @@ func new(cfg Configuration, args []string) (string, error) {
 	}
 
 	return createdFilePath + "\n", nil
+}
+
+func link(cfg Configuration, args []string) (string, error) {
+	src, err := filepath.Abs(args[0])
+	if err != nil {
+		return "", err
+	}
+
+	dest, err := filepath.Abs(args[1])
+	if err != nil {
+		return "", err
+	}
+
+	destFileName := filepath.Base(dest)
+	destTitle, _ := strings.CutSuffix(destFileName, ".md")
+
+	relPath, err := filepath.Rel(filepath.Dir(src), dest)
+	if err != nil {
+		return "", err
+	}
+
+	urlEncodedDestFileName := url.PathEscape(destFileName)
+	link := fmt.Sprintf("[%s](%s)", destTitle, filepath.Join(filepath.Dir(relPath), urlEncodedDestFileName))
+
+	return link, nil
 }
 
 // HELPER
