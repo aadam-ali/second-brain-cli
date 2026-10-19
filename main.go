@@ -36,6 +36,9 @@ func run(args []string) error {
 	if err := os.MkdirAll(cfg.RootDir, 0700); err != nil {
 		return err
 	}
+	if err := os.MkdirAll(cfg.TodoDir, 0700); err != nil {
+		return err
+	}
 
 	switch args[0] {
 	case "new", "n":
