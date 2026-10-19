@@ -58,12 +58,15 @@ func run(args []string) error {
 		if len(args) > 1 {
 			str, err = todo(cfg, args[1:])
 		}
+	case "usage", "help", "u", "h":
+		str, err = usage(cfg, args[1:])
 	default:
-		return NotImplementedError
+		str, _ = usage(cfg, args[1:])
+		err = NotImplementedError
 	}
 
 	if err != nil {
-		fmt.Printf("%v\n", err)
+		fmt.Printf("%v\n%s", err, str)
 		return err
 	} else {
 		fmt.Print(str)
@@ -188,6 +191,20 @@ func path(cfg Configuration, args []string) (string, error) {
 	}
 
 	return absFilePath, nil
+}
+
+func usage(cfg Configuration, args []string) (string, error) {
+	return `Usage: sb COMMAND [ARGS]...
+
+Commands:
+
+  link [src] [dest]       Print a relative markdown link from src to dest
+  new [title]             Create a new note
+  path [dir] [relpath]    Print the absolute path to a note from dir (if one exists)
+  todo [title]            Create a new todo note (also updates $NOTES_TODO/TODO.md)
+  version                 Show the current version
+  help                    Output this message
+`, nil
 }
 
 func version(cfg Configuration, args []string) (string, error) {

@@ -160,6 +160,28 @@ func TestVersionCmd(t *testing.T) {
 	assert.NoError(t, actualErr)
 }
 
+func TestHelpCmd(t *testing.T) {
+	sb := prepareEnvironment(true, []string{})
+	os.RemoveAll(sb)
+
+	expected := `Usage: sb COMMAND [ARGS]...
+
+Commands:
+
+  link [src] [dest]       Print a relative markdown link from src to dest
+  new [title]             Create a new note
+  path [dir] [relpath]    Print the absolute path to a note from dir (if one exists)
+  todo [title]            Create a new todo note (also updates $NOTES_TODO/TODO.md)
+  version                 Show the current version
+  help                    Output this message
+`
+
+	actualStdout, _, actualErr := captureOutput(run, []string{"help"})
+
+	assert.Equal(t, expected, actualStdout)
+	assert.NoError(t, actualErr)
+}
+
 // TEST HELPERS
 
 func captureOutput(fn func(args []string) error, args []string) (string, string, error) {
