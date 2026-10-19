@@ -17,6 +17,7 @@ import (
 var Now = time.Now
 
 var NotImplementedError = errors.New("command isn't implemented")
+var NoteDoesntExistError = errors.New("note doesn't exist")
 
 // ENTRYPOINT
 
@@ -47,6 +48,10 @@ func run(args []string) error {
 	case "link", "l":
 		if len(args) == 3 {
 			str, err = link(cfg, args[1:])
+		}
+	case "path", "p":
+		if len(args) == 3 {
+			str, err = path(cfg, args[1:])
 		}
 	default:
 		return nil
@@ -106,6 +111,27 @@ func link(cfg Configuration, args []string) (string, error) {
 	link := fmt.Sprintf("[%s](%s)", destTitle, filepath.Join(filepath.Dir(relPath), urlEncodedDestFileName))
 
 	return link, nil
+}
+
+func path(cfg Configuration, args []string) (string, error) {
+	baseDir := args[0]
+	fileRelPath := args[1]
+
+	urlDecodedFileRelPath, err := url.PathUnescape(fileRelPath)
+	if err != nil {
+		return "", err
+	}
+
+	absFilePath, err := filepath.Abs(filepath.Join(baseDir, urlDecodedFileRelPath))
+	if err != nil {
+		return "", err
+	}
+
+	if _, err := os.Stat(filepath.Join(baseDir, urlDecodedFileRelPath)); err != nil {
+		return "", NoteDoesntExistError
+	}
+
+	return absFilePath, nil
 }
 
 // HELPER
