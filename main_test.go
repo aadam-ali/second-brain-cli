@@ -65,6 +65,45 @@ func TestNewCmd(t *testing.T) {
 	}
 }
 
+func TestTodoCmd(t *testing.T) {
+	Now = func() time.Time {
+		return time.Date(2025, 7, 13, 20, 0, 0, 0, time.UTC)
+	}
+	title := "Go to the shops"
+
+	sb := prepareEnvironment(true, []string{})
+	defer os.RemoveAll(sb)
+
+	var expectedError error
+	expectedStdoutFilepath := filepath.Join(sb, "todo", "2025-07-13 "+title+".md")
+
+	actualStdout, _, actualError := captureOutput(run, []string{"todo", title})
+
+	todoLines := readLines(expectedStdoutFilepath)
+	todoListLines := readLines(filepath.Join(sb, "todo", "TODO.md"))
+
+	assert.Equal(t, expectedError, actualError)
+	assert.Contains(t, expectedStdoutFilepath+"\n", actualStdout)
+
+	assert.FileExists(t, expectedStdoutFilepath)
+	assert.Equal(t, len(todoLines), 5)
+	assert.Equal(t, todoLines[0:5], []string{
+		"---",
+		"title: 'Go to the shops'",
+		"date: 2025-07-13",
+		"tags: []",
+		"---",
+	})
+
+	assert.FileExists(t, filepath.Join(sb, "todo", "TODO.md"))
+	assert.Equal(t, len(todoListLines), 3)
+	assert.Equal(t, todoListLines[0:3], []string{
+		"# TODO",
+		"",
+		"- [ ] [2025-07-13 Go to the shops](2025-07-13%20Go%20to%20the%20shops.md)",
+	})
+}
+
 func TestLinkCmd(t *testing.T) {
 	var testCases = []struct {
 		destFilenameWithoutExtension string

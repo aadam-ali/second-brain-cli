@@ -17,6 +17,7 @@ var Version string = "development"
 var Now = time.Now
 
 var NotImplementedError = errors.New("command isn't implemented")
+var NoteExistsError = errors.New("note exists")
 var NoteDoesntExistError = errors.New("note doesn't exist")
 
 // ENTRYPOINT
@@ -53,6 +54,10 @@ func run(args []string) error {
 		if len(args) == 1 {
 			str, err = version(cfg, args[1:])
 		}
+	case "todo", "t":
+		if len(args) > 1 {
+			str, err = todo(cfg, args[1:])
+		}
 	default:
 		return NotImplementedError
 	}
@@ -86,6 +91,57 @@ func new(cfg Configuration, args []string) (string, error) {
 	}
 
 	return createdFilePath + "\n", nil
+}
+
+func todo(cfg Configuration, args []string) (string, error) {
+	var title string
+
+	if len(args) > 1 {
+		title = strings.Join(args, " ")
+	} else {
+		title = args[0]
+	}
+	santisedTitle := sanitiseTitle(title)
+	fileName := cfg.Date + " " + santisedTitle + ".md"
+	filePath := filepath.Join(cfg.TodoDir, fileName)
+
+	todoPath, err := createNote(filePath, title, cfg.Date)
+	if err != nil {
+		return "", err
+	}
+
+	todoPath, _ = strings.CutSuffix(todoPath, "\n")
+
+	if err != nil {
+		if err == NoteExistsError {
+			return todoPath + "\n", nil
+		}
+
+		return "", err
+	}
+
+	todoList := filepath.Join(cfg.TodoDir, "TODO.md")
+	if _, err := os.Stat(todoList); err != nil {
+		if _, err := createFile(todoList, fmt.Appendf(nil, "# TODO\n\n")); err != nil {
+			return "", err
+		}
+	}
+
+	f, err := os.OpenFile(todoList, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+	if err != nil {
+		return "", err
+	}
+
+	defer f.Close()
+
+	todoLink, err := link(cfg, []string{todoList, todoPath})
+	todoLink, _ = strings.CutSuffix(todoLink, "\n")
+
+	if _, err = f.WriteString("- [ ] " + todoLink); err != nil {
+		return "", err
+	}
+
+	return todoPath + "\n", nil
 }
 
 func link(cfg Configuration, args []string) (string, error) {
@@ -150,10 +206,12 @@ func loadConfig() Configuration {
 	userHomeDir, _ := os.UserHomeDir()
 
 	rootDir := getEnv("NOTES", filepath.Join(userHomeDir, "notes"))
+	todoDir := getEnv("NOTES_TODO", filepath.Join(rootDir, "todo"))
 	date := Now().Format("2006-01-02")
 
 	return Configuration{
 		RootDir: rootDir,
+		TodoDir: todoDir,
 		Date:    date,
 	}
 }
