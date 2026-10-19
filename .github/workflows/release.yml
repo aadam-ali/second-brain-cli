@@ -25,5 +25,5 @@ jobs:
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
         goversion: "1.26"
-        ldflags: -X "github.com/aadam-ali/second-brain-cli/config.version=${{ github.ref_name }}"
+        ldflags: -X "config.Version=${{ github.ref_name }}"
         binary_name: "sb"
