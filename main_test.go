@@ -65,7 +65,49 @@ func TestNewCmd(t *testing.T) {
 	}
 }
 
-// TEST HELPERS
+func TestLinkCmd(t *testing.T) {
+	var testCases = []struct {
+		destFilenameWithoutExtension string
+		urlEncodedDestFilename       string
+	}{
+		{"bonjour-world", "bonjour-world.md"},
+		{"bonjour world", "bonjour%20world.md"},
+	}
+
+	for _, tt := range testCases {
+		sb := prepareEnvironment(true, []string{})
+		defer os.RemoveAll(sb)
+
+		src := filepath.Join(sb, "hello-world.md")
+		dest := filepath.Join(sb, "todo", tt.destFilenameWithoutExtension+".md")
+
+		os.Create(src)
+		os.Create(dest)
+
+		expectedOutput := fmt.Sprintf("[%s](todo/%s)", tt.destFilenameWithoutExtension, tt.urlEncodedDestFilename)
+		actualOutput, _, acutalError := captureOutput(run, []string{"link", src, dest})
+
+		assert.NoError(t, acutalError)
+		assert.Equal(t, expectedOutput, actualOutput)
+	}
+}
+
+func TestLinkCmdNested(t *testing.T) {
+	sb := prepareEnvironment(true, []string{"1/2/3", "a/b"})
+	defer os.RemoveAll(sb)
+
+	src := filepath.Join(sb, "1/2/3", "hello-world.md")
+	dest := filepath.Join(sb, "a/b", "file.md")
+
+	os.Create(src)
+	os.Create(dest)
+
+	expectedOutput := fmt.Sprintf("[%s](../../../a/b/%s)", "file", "file.md")
+	actualOutput, _, acutalError := captureOutput(run, []string{"link", src, dest})
+
+	assert.NoError(t, acutalError)
+	assert.Equal(t, expectedOutput, actualOutput)
+}
 
 // TEST HELPERS
 
