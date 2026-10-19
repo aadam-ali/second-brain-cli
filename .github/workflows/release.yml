@@ -25,6 +25,6 @@ jobs:
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
         goversion: "1.27"
-        ldflags: -X "config.Version=${{ github.ref_name }}"
+        ldflags: -X "main.Version=${{ github.ref_name }}"
         binary_name: "sb"
         compress_assets: OFF
